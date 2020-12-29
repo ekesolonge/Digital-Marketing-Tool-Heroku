@@ -16,11 +16,7 @@ const reply = require("./controllers/reply"); //Reply Controller
 const billing_info = require("./controllers/billing_info"); //Reply Controller
 const payment = require("./controllers/payment"); // payment module
 const stickyNote = require("./controllers/sticky_note"); // stickyNote module
-const roleController = require("./controllers/roleController"); //roleController module
-const permissionController = require("./controllers/permissionController"); //permissionController module
 const subscriber_group = require("./controllers/subscriber_group"); //subscriber_group module
-
-
 
 // Dynamic port listener
 const port = process.env.PORT || 3000; // set port
@@ -33,8 +29,8 @@ app.use("/api/emailTemplates", emailTemplate);
 app.use("/api/audience", audience);
 app.use("/api/contactUs", contactUs);
 app.use("/api/newsletter", newsletter);
-app.use("api/campaign", campaign)
-app.use("api/subscriber_group", subscriber_group)
+app.use("api/campaign", campaign);
+app.use("api/subscriber_group", subscriber_group);
 app.use("/api/role", role);
 app.use("/api/permission", permission);
 
@@ -43,9 +39,6 @@ reply(app);
 billing_info(app);
 payment(app);
 stickyNote(app);
-roleController(app);
-permissionController(app);
-
 
 // Listen on port
 app.listen(port, () => console.log(`Listening on port ${port}...`));
