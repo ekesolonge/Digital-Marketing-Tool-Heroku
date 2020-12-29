@@ -13,7 +13,7 @@ const {
   createPermission,
   editPermission,
   assignPermission,
-} = require("../controllers/PermissionController");
+} = require("../controllers/permissionController");
 
 // VIEW PermissionS
 router.get("/", authenticate, managePermission, getPermissions);
