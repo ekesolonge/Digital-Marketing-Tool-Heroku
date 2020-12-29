@@ -2,10 +2,10 @@ const mysql = require("mysql"); // mysql module
 
 // Create SQL connection
 const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "",
-  database: "martreach",
+  host: "us-cdbr-east-02.cleardb.com",
+  user: "b83cbfeb7950d0",
+  password: "24e38b68",
+  database: "heroku_21d25399649ff1b",
 });
 
 // Test SQL connection

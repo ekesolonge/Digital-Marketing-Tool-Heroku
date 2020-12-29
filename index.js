@@ -16,7 +16,6 @@ const reply = require("./controllers/reply"); //Reply Controller
 const billing_info = require("./controllers/billing_info"); //Reply Controller
 const payment = require("./controllers/payment"); // payment module
 const stickyNote = require("./controllers/sticky_note"); // stickyNote module
-const subscriber_group = require("./controllers/subscriber_group"); //subscriber_group module
 
 // Dynamic port listener
 const port = process.env.PORT || 3000; // set port
@@ -24,13 +23,14 @@ const app = express(); // express init
 app.use(bodyParser.json()); // Middleware use with express
 
 // Routes
+app.use("/", (req, res) => res.send("Welcome to my API"));
 app.use("/api/users", users);
 app.use("/api/emailTemplates", emailTemplate);
-app.use("/api/audience", audience);
+// app.use("/api/audience", audience);
 app.use("/api/contactUs", contactUs);
 app.use("/api/newsletter", newsletter);
-app.use("api/campaign", campaign);
-app.use("api/subscriber_group", subscriber_group);
+// app.use("api/campaign", campaign);
+// app.use("api/subscriber_group", subscriber_group);
 app.use("/api/role", role);
 app.use("/api/permission", permission);
 

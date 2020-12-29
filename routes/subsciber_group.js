@@ -1,33 +1,29 @@
+//   const express = require("express"); // express module
+//   const router = express.Router(); // router
+//   const connection = require("../models/db");
+//   const { authenticate } = require("../middleware/authorization"); // authorization middleware
+//   const {
+//     getUsers,
+//     getUserById,
+//     deleteUser,
+//     createUser,
+//     editUser,
 
-  const express = require("express"); // express module
-  const router = express.Router(); // router
-  const connection = require("../models/db");
-  const { authenticate } = require("../middleware/authorization"); // authorization middleware
-  const {
-    getUsers,
-    getUserById,
-    deleteUser,
-    createUser,
-    editUser,
-   
-  } = require("../controllers/subscriber_group");
+//   } = require("../controllers/subscriber_group");
 
+//   // GET ALL USERS
+// router.get("/", authenticate, manageUser, getUsers);
 
+// // GET ALL USERS BY ID
+// router.get("/:id", authenticate, manageUser, getUserById);
 
-  // GET ALL USERS
-router.get("/", authenticate, manageUser, getUsers);
+// // DELETE USERS
+// router.delete("/:id", authenticate, manageUser, deleteUser);
 
-// GET ALL USERS BY ID
-router.get("/:id", authenticate, manageUser, getUserById);
+// // CREATE A NEW USER
+// router.post("/", authenticate, manageUser, createUser);
 
-// DELETE USERS
-router.delete("/:id", authenticate, manageUser, deleteUser);
+// // EDIT USER
+// router.put("/:id", authenticate, manageUser, editUser);
 
-// CREATE A NEW USER
-router.post("/", authenticate, manageUser, createUser);
-
-// EDIT USER
-router.put("/:id", authenticate, manageUser, editUser);
-
-
-module.exports = router;
+// module.exports = router;
