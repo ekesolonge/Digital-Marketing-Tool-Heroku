@@ -17,13 +17,10 @@ const billing_info = require("./controllers/billing_info"); //Reply Controller
 const payment = require("./controllers/payment"); // payment module
 const stickyNote = require("./controllers/sticky_note"); // stickyNote module
 
-// Dynamic port listener
-const port = process.env.PORT || 3000; // set port
 const app = express(); // express init
 app.use(bodyParser.json()); // Middleware use with express
 
 // Routes
-app.use("/", (req, res) => res.send("Welcome to my API"));
 app.use("/api/users", users);
 app.use("/api/emailTemplates", emailTemplate);
 // app.use("/api/audience", audience);
@@ -41,4 +38,5 @@ payment(app);
 stickyNote(app);
 
 // Listen on port
+const port = process.env.PORT || 3000; // set port
 app.listen(port, () => console.log(`Listening on port ${port}...`));
