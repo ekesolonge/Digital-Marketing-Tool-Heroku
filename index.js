@@ -1,6 +1,7 @@
 const express = require("express"); // express module
 const bodyParser = require("body-parser"); // body-parser middleware
 
+const home = require("./routes/home");
 const users = require("./routes/users");
 const emailTemplate = require("./routes/emailTemplates");
 const audience = require("./routes/audience");
@@ -21,6 +22,7 @@ const app = express(); // express init
 app.use(bodyParser.json()); // Middleware use with express
 
 // Routes
+app.use("/", home);
 app.use("/api/users", users);
 app.use("/api/emailTemplates", emailTemplate);
 // app.use("/api/audience", audience);
