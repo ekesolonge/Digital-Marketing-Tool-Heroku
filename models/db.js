@@ -1,13 +1,14 @@
 const mysql = require("mysql"); // mysql module
 var connection;
+var dbConfig = {
+  host: "us-cdbr-east-02.cleardb.com",
+  user: "b83cbfeb7950d0",
+  password: "24e38b68",
+  database: "heroku_21d25399649ff1b",
+};
 
 function handleDisconnect() {
-  connection = mysql.createConnection({
-    host: "us-cdbr-east-02.cleardb.com",
-    user: "b83cbfeb7950d0",
-    password: "24e38b68",
-    database: "heroku_21d25399649ff1b",
-  });
+  connection = mysql.createConnection(dbConfig);
 
   connection.connect(function (err) {
     if (err) {
