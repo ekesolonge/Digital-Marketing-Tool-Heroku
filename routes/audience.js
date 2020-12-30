@@ -7,7 +7,7 @@ const {
   deleteAudience,
   createAudience,
   editAudience,
-} = require("../controllers/AudienceController");
+} = require("../controllers/audienceController");
 
 // GET ALL Audience
 router.get("/", authenticate, getAudience);
