@@ -1,29 +1,27 @@
-//     const express = require("express"); // express module
-//     const router = express.Router(); // router
-//     const connection = require("../models/db");
-//     const { authenticate } = require("../middleware/authorization"); // authorization middleware
-//     const {
-//         getUsers,
-//         getUserById,
-//         deleteUser,
-//         createUser,
-//         editUser,
+const express = require("express"); // express module
+const router = express.Router(); // router
+const { authenticate } = require("../middleware/authorization"); // authorization middleware
+const {
+  getCampaign,
+  getCampaignById,
+  deleteCampaign,
+  createCampaign,
+  editCampaign,
+} = require("../controllers/campaignController");
 
-//       } = require("../controllers/campaignController");
+// GET ALL Campaign
+router.get("/", authenticate, getCampaign);
 
-//       // GET ALL USERS
-// router.get("/", authenticate, manageUser, getUsers);
+// GET ALL Campaign BY ID
+router.get("/:id", authenticate, getCampaignById);
 
-// // GET ALL USERS BY ID
-// router.get("/:id", authenticate, manageUser, getUserById);
+// DELETE Campaign
+router.delete("/:id", authenticate, deleteCampaign);
 
-// // DELETE USERS
-// router.delete("/:id", authenticate, manageUser, deleteUser);
+// CREATE A NEW Campaign
+router.post("/", authenticate, createCampaign);
 
-// // CREATE A NEW USER
-// router.post("/", authenticate, manageUser, createUser);
+// EDIT Campaign
+router.put("/:id", authenticate, editCampaign);
 
-// // EDIT USER
-// router.put("/:id", authenticate, manageUser, editUser);
-
-//   module.exports = router;
+module.exports = router;

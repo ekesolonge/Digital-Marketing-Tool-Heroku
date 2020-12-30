@@ -1,30 +1,27 @@
-// const express = require("express"); // express module
-// const router = express.Router(); // router
-// const connection = require("../models/db"); // database module
-// const { authenticate } = require("../middleware/authorization"); // authorization middleware
+const express = require("express"); // express module
+const router = express.Router(); // router
+const { authenticate } = require("../middleware/authorization"); // authorization middleware
+const {
+  getAudience,
+  getAudienceById,
+  deleteAudience,
+  createAudience,
+  editAudience,
+} = require("../controllers/AudienceController");
 
-// const {
-//   getUsers,
-//   getUserById,
-//   deleteUser,
-//   createUser,
-//   editUser,
+// GET ALL Audience
+router.get("/", authenticate, getAudience);
 
-// } = require("../controllers/audienceController");
+// GET ALL Audience BY ID
+router.get("/:id", authenticate, getAudienceById);
 
-// // GET ALL USERS
-// router.get("/", authenticate, manageUser, getUsers);
+// DELETE Audience
+router.delete("/:id", authenticate, deleteAudience);
 
-// // GET ALL USERS BY ID
-// router.get("/:id", authenticate, manageUser, getUserById);
+// CREATE A NEW Audience
+router.post("/", authenticate, createAudience);
 
-// // DELETE USERS
-// router.delete("/:id", authenticate, manageUser, deleteUser);
+// EDIT Audience
+router.put("/:id", authenticate, editAudience);
 
-// // CREATE A NEW USER
-// router.post("/", authenticate, manageUser, createUser);
-
-// // EDIT USER
-// router.put("/:id", authenticate, manageUser, editUser);
-
-// module.exports = router;
+module.exports = router;

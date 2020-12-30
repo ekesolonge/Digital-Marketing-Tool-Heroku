@@ -8,15 +8,14 @@ const audience = require("./routes/audience");
 const contactUs = require("./routes/contactUs");
 const newsletter = require("./routes/newsletter");
 const campaign = require("./routes/campaign");
-const subscriber_group = require("./routes/subsciber_group");
+const subscriberGroup = require("./routes/subscriberGroup");
 const role = require("./routes/role");
 const permission = require("./routes/permission");
-
-const suggestions = require("./controllers/suggestions"); //Suggestions Controller
-const reply = require("./controllers/reply"); //Reply Controller
-const billing_info = require("./controllers/billing_info"); //Reply Controller
-const payment = require("./controllers/payment"); // payment module
-const stickyNote = require("./controllers/sticky_note"); // stickyNote module
+const suggestions = require("./routes/suggestions");
+const reply = require("./routes/reply");
+const billingInfo = require("./routes/billingInfo");
+const payment = require("./routes/payment");
+const stickyNote = require("./routes/stickyNote");
 
 const app = express(); // express init
 app.use(bodyParser.json()); // Middleware use with express
@@ -25,25 +24,24 @@ app.use(bodyParser.json()); // Middleware use with express
 app.use("/", home);
 app.use("/api/users", users);
 app.use("/api/emailTemplates", emailTemplate);
-// app.use("/api/audience", audience);
+app.use("/api/audience", audience);
 app.use("/api/contactUs", contactUs);
 app.use("/api/newsletter", newsletter);
-// app.use("api/campaign", campaign);
-// app.use("api/subscriber_group", subscriber_group);
+app.use("/api/campaign", campaign);
+app.use("/api/subscriberGroup", subscriberGroup);
 app.use("/api/role", role);
 app.use("/api/permission", permission);
+app.use("/api/suggestions", suggestions);
+app.use("/api/reply", reply);
+app.use("/api/billingInfo", billingInfo);
+app.use("/api/payment", payment);
+app.use("/api/stickyNote", stickyNote);
 
 // 404
 app.use((req, res, next) => {
   res.status(404);
   res.send("Error 404 page doesn't exist");
 });
-
-suggestions(app);
-reply(app);
-billing_info(app);
-payment(app);
-stickyNote(app);
 
 // Listen on port
 const port = process.env.PORT || 3000; // set port
