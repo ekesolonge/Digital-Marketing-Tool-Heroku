@@ -32,8 +32,11 @@ app.use("/api/newsletter", newsletter);
 // app.use("api/subscriber_group", subscriber_group);
 app.use("/api/role", role);
 app.use("/api/permission", permission);
+
+// 404
 app.use((req, res, next) => {
-  res.statusCode(404).send("Error 404 page doesn't exist");
+  res.status(404);
+  res.send("Error 404 page doesn't exist");
 });
 
 suggestions(app);
