@@ -13,6 +13,9 @@ const {
   signup,
   login,
   activateAccount,
+  resetPassword,
+  handleResetPassword,
+  setPassword,
 } = require("../controllers/userControllers");
 
 // GET ALL USERS
@@ -38,5 +41,14 @@ router.post("/login", login);
 
 // Activate User Account
 router.get("/auth/activation/:userId/:otpCode", activateAccount);
+
+// Reset Password
+router.post("/resetPassword", resetPassword);
+
+// Handle Password Reset
+router.get("/auth/reset/:userId/:otpCode", handleResetPassword);
+
+// Set New Password
+router.post("/setNewPassword", setPassword);
 
 module.exports = router;

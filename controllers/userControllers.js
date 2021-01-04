@@ -317,6 +317,116 @@ const login = (req, res, next) => {
   );
 };
 
+// Reset Password
+const resetPassword = (req, res, next) => {
+  connection.query(
+    `SELECT * FROM users WHERE email = '${req.body.email}'`,
+    (err, resp) => {
+      if (err) return res.status(422).json({ message: "internal error" });
+      if (resp.length < 1)
+        return res.status(422).json({ message: "invalid email supplied" });
+      else {
+        const otpCode = randomstring.generate();
+        connection.query(
+          `UPDATE users SET otp = '${otpCode}' WHERE id = ${resp[0].id}`,
+          (err2, resp2) => {
+            const encodedUserId = encodeURIComponent(
+              Buffer.from(`${resp[0].id}`, "binary").toString("base64")
+            );
+            const encodedOtpCode = encodeURIComponent(
+              Buffer.from(`${otpCode}`, "binary").toString("base64")
+            );
+            sendMail(
+              "MartReach Admin <martreach2@gmail.com>",
+              "Request to reset password, MartReach",
+              `${resp[0].email}`,
+              `Hi ${resp[0].firstName}, <br/>
+                    <p>A request was initiated to reset your password. Click <a href="${process.env.BASE_URL}/api/users/auth/reset/${encodedUserId}/${encodedOtpCode}"><b>here</b></a> on the button below to reset your account password.</p>
+                    <p>Or Copy the link below to your browser:<br/>
+                    <a href="${process.env.BASE_URL}/api/users/auth/reset/${encodedUserId}/${encodedOtpCode}">${process.env.BASE_URL}/api/users/auth/reset/${encodedUserId}/${encodedOtpCode}</a></p>
+                    <br/>
+                    Please, ignore and this mail if you did not make the request! Thanks.`,
+              (err3, info) => {
+                if (err3) return res.status(500).send(err3);
+                res
+                  .status(201)
+                  .send(
+                    "Password reset requested! Please, check your mail and reset your password!"
+                  );
+              }
+            );
+          }
+        );
+      }
+    }
+  );
+};
+
+// Handle Password Reset
+const handleResetPassword = (req, res) => {
+  const decodedUserId = decodeURIComponent(req.params.userId);
+  const decodedOtpCode = decodeURIComponent(req.params.otpCode);
+
+  const userId = Buffer.from(decodedUserId, "base64").toString();
+  const otpCode = Buffer.from(decodedOtpCode, "base64").toString();
+
+  connection.query(
+    `SELECT email, otp, isEnabled FROM users WHERE id = ${userId}`,
+    (err, resp) => {
+      if (err) {
+        return res.status(422).json({ message: "Internal Error!" });
+      }
+      if (resp.length > 0) {
+        if (resp[0].otp == otpCode) {
+          return res.status(200).json({ userId: userId, status: "Verified" });
+        } else {
+          return res.status(401).json({ message: "Error resetting password!" });
+        }
+      } else {
+        return res.status(404).json({ message: "No user found!" });
+      }
+    }
+  );
+};
+
+// Set New Password from Reset
+const setPassword = (req, res) => {
+  let { userId, newPassword, otpCode } = req.body;
+
+  connection.query(
+    `SELECT email, otp FROM users WHERE id = ${userId}`,
+    (err, resp) => {
+      if (err) {
+        return res.status(422).json({ message: "Internal Error!" });
+      }
+      if (resp.length > 0) {
+        if (resp[0].otp == otpCode) {
+          // Hash password
+          bcrypt.hash(newPassword, 10, (err, hash) => {
+            connection.query(
+              `UPDATE users SET otp = null, password = '${hash}' WHERE id = ${userId}`,
+              (err2, resp2) => {
+                if (err2) {
+                  return res.status(422).json({ message: "Internal error" });
+                }
+                return res.status(201).send("Password reset successful");
+              }
+            );
+          });
+        } else {
+          return res.status(401).json({
+            message: "Error resetting password! Please check the link again",
+          });
+        }
+      } else {
+        return res
+          .status(404)
+          .json({ message: "No account found! Check  Link Again" });
+      }
+    }
+  );
+};
+
 // Activate User Account
 const activateAccount = (req, res) => {
   const decodedUserId = decodeURIComponent(req.params.userId);
@@ -402,3 +512,6 @@ module.exports.editUser = editUser;
 module.exports.signup = signup;
 module.exports.login = login;
 module.exports.activateAccount = activateAccount;
+module.exports.resetPassword = resetPassword;
+module.exports.handleResetPassword = handleResetPassword;
+module.exports.setPassword = setPassword;
