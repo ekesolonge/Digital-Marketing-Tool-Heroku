@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 const defaultRole = require("../middleware/defaultRole");
 const Joi = require("joi"); // validator
 const logTrail = require("../middleware/auditTrail");
+const sendMail = require("../middleware/mailer");
+const randomstring = require("randomstring");
 
 // GET USERS
 const getUsers = (req, res, next) => {
@@ -179,6 +181,7 @@ const signup = (req, res, next) => {
     password,
     website,
     picture,
+    otp,
   } = req.body;
 
   if (!website) website = "";
@@ -201,9 +204,11 @@ const signup = (req, res, next) => {
         bcrypt.hash(password, 10, (err, hash) => {
           if (err) return res.send(err);
 
+          const otpCode = randomstring.generate();
+
           // INSERT into database
           connection.query(
-            `insert into users (firstName,lastName,username,tel,email,password,website,picture,isEnabled) values
+            `insert into users (firstName,lastName,username,tel,email,password,website,picture,otp,isEnabled) values
               ('${firstName}',
               '${lastName}',
               '${username}',
@@ -212,12 +217,37 @@ const signup = (req, res, next) => {
               '${hash}',
               '${website}',
               '${picture}',
-              'true')`,
+              '${otpCode}',
+              'false')`,
             (error, resp2) => {
               if (error) return res.send(error.sqlMessage);
-              res.send("User successfully created.");
-              defaultRole(resp2.insertId); // assigns user role to new users
-              res.end();
+
+              const encodedUserId = encodeURIComponent(
+                Buffer.from(`${resp2.insertId}`, "binary").toString("base64")
+              );
+              const encodedOtpCode = encodeURIComponent(
+                Buffer.from(`${otpCode}`, "binary").toString("base64")
+              );
+
+              sendMail(
+                "MartReach Admin <martreach2@gmail.com>",
+                "User Registration Successful! Please, Activate Your Account!",
+                `${req.body.email}`,
+                `Hi ${req.body.firstName}, <br/>
+                        <p>Welcome to <b>MartReach</b>, thank you for your registration. Click <a href="${process.env.BASE_URL}/api/users/auth/activation/${encodedUserId}/${encodedOtpCode}"><b>here</b></a> to activate your account.
+                        <p>Or Copy the link below to your browser:<br/>
+                        <a href="${process.env.BASE_URL}/api/users/auth/activation/${encodedUserId}/${encodedOtpCode}">${process.env.BASE_URL}/api/users/auth/activation/${encodedUserId}/${encodedOtpCode}}</a></p>
+                        <br/>`,
+                (err3, info) => {
+                  if (err3) return res.status(500).send(err3);
+                  res
+                    .status(201)
+                    .send(
+                      "Signup Successful! Please, check your mail and activate your account!"
+                    );
+                  defaultRole(resp2.insertId);
+                }
+              );
             }
           );
         });
@@ -230,54 +260,104 @@ const signup = (req, res, next) => {
 const login = (req, res, next) => {
   connection.query(
     `SELECT * FROM users inner join user_role on users.id = user_role.userId WHERE username='${req.body.username}'`,
-    (err, resp) => {
+    async (err, resp) => {
       if (err || resp.length < 1) {
         res.statusCode = 401;
         res.send("Invalid username and password.");
+      } else if (resp[0].isEnabled == "true") {
+        var result = await bcrypt.compare(req.body.password, resp[0].password);
+        if (result === false) {
+          res.statusCode = 401;
+          res.send("Invalid username and password");
+
+          // Audit Trail
+          let trail = {
+            actor: "anonymous",
+            action: `anonymous user: ${req.body.username} failed login attempt`,
+            type: "danger",
+          };
+          logTrail(trail);
+        } else {
+          // Check permissions
+          connection.query(
+            `select permissionName,groupName from permission inner join role_permission on permission.permissionId = role_permission.permissionId where role_permission.roleId = ${resp[0].roleId}`,
+            (err, resPerm) => {
+              if (err) return res.status(401).send(err);
+              resp[0].permissions = resPerm;
+              delete resp[0].password;
+
+              // Token logic
+              let data = { data: resp[0] };
+              let token = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, {
+                expiresIn: process.env.ACCESS_TOKEN_LIFE,
+              });
+              let tokenData = {
+                data: resp[0],
+                accessToken: token,
+              };
+              res.send(tokenData);
+
+              let trail = {
+                actor: req.body.username,
+                action: `successful login`,
+                type: "success",
+              };
+              logTrail(trail);
+            }
+          );
+        }
       } else {
-        bcrypt.compare(req.body.password, resp[0].password, (err, result) => {
-          if (result === false) {
-            res.statusCode = 401;
-            res.send("Invalid username and password");
+        res
+          .status(401)
+          .send(
+            `Account not activated! Please, check your mail or request for another activation link here`
+          );
+      }
+    }
+  );
+};
 
-            // Audit Trail
-            let trail = {
-              actor: "anonymous",
-              action: `anonymous user: ${req.body.username} failed login attempt`,
-              type: "danger",
-            };
-            logTrail(trail);
-          }
-          if (result === true) {
-            // Check permissions
-            connection.query(
-              `select permissionName,groupName from permission inner join role_permission on permission.permissionId = role_permission.permissionId where role_permission.roleId = ${resp[0].roleId}`,
-              (err, resPerm) => {
-                if (err) return res.status(401).send(err);
-                resp[0].permissions = resPerm;
-                delete resp[0].password;
+// Activate User Account
+const activateAccount = (req, res) => {
+  const decodedUserId = decodeURIComponent(req.params.userId);
+  const decodedOtpCode = decodeURIComponent(req.params.otpCode);
 
-                // Token logic
-                let data = { data: resp[0] };
-                let token = jwt.sign(data, process.env.ACCESS_TOKEN_SECRET, {
-                  expiresIn: process.env.ACCESS_TOKEN_LIFE,
-                });
-                let tokenData = {
-                  data: resp[0],
-                  accessToken: token,
-                };
-                res.send(tokenData);
+  const userId = Buffer.from(decodedUserId, "base64").toString();
+  const otpCode = Buffer.from(decodedOtpCode, "base64").toString();
 
-                let trail = {
-                  actor: req.body.username,
-                  action: `successful login`,
-                  type: "success",
-                };
-                logTrail(trail);
+  connection.query(
+    `SELECT email, otp, isEnabled FROM users WHERE id = ${userId}`,
+    (err, resp) => {
+      if (err) {
+        return res.status(422).json({ message: "Internal Error!" });
+      }
+      if (resp.length > 0) {
+        if (resp[0].isEnabled == "true") {
+          return res
+            .status(200)
+            .json({ message: "Account already activated! Proceed to login" });
+        }
+        if (resp[0].otp == otpCode) {
+          connection.query(
+            `UPDATE users SET isEnabled = 'true', otp = null WHERE id = ${userId}`,
+            (err2, resp2) => {
+              if (err2) {
+                return res.status(422).json({ message: "Internal error" });
               }
-            );
-          }
-        });
+              return res.status(201).json({
+                message: "Account activated! You may proceed to login",
+              });
+            }
+          );
+        } else {
+          return res.status(401).json({
+            message: "Error validating account! Please check the link again",
+          });
+        }
+      } else {
+        return res
+          .status(404)
+          .json({ message: "No account found! Check Activation Link Again" });
       }
     }
   );
@@ -321,3 +401,4 @@ module.exports.createUser = createUser;
 module.exports.editUser = editUser;
 module.exports.signup = signup;
 module.exports.login = login;
+module.exports.activateAccount = activateAccount;

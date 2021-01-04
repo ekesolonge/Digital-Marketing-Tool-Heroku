@@ -12,6 +12,7 @@ const {
   editUser,
   signup,
   login,
+  activateAccount,
 } = require("../controllers/userControllers");
 
 // GET ALL USERS
@@ -34,5 +35,8 @@ router.post("/signup", signup);
 
 // LOGIN
 router.post("/login", login);
+
+// Activate User Account
+router.get("/auth/activation/:userId/:otpCode", activateAccount);
 
 module.exports = router;
