@@ -192,7 +192,7 @@ const signup = (req, res, next) => {
   connection.query(
     `select * from users where username = '${username}' OR email = '${email}'`,
     (err, resp) => {
-      if (err) return res.status(400).send({ message: err.sqlMessage });
+      if (err) return res.status(400).json({ message: err.sqlMessage });
 
       if (resp.length > 0) {
         if (username === resp[0].username)
