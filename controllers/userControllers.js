@@ -445,7 +445,9 @@ const activateAccount = (req, res) => {
         if (resp[0].isEnabled == "true") {
           return res
             .status(200)
-            .json({ message: "Account already activated! Proceed to login" });
+            .redirect(
+              "https://md-ameenu.github.io/DIGITAL-MARKETING-TOOL-REACT-MIGRATION-/#/"
+            );
         }
         if (resp[0].otp == otpCode) {
           connection.query(
@@ -454,9 +456,11 @@ const activateAccount = (req, res) => {
               if (err2) {
                 return res.status(422).json({ message: "Internal error" });
               }
-              return res.status(201).json({
-                message: "Account activated! You may proceed to login",
-              });
+              return res
+                .status(201)
+                .redirect(
+                  "https://md-ameenu.github.io/DIGITAL-MARKETING-TOOL-REACT-MIGRATION-/#/"
+                );
             }
           );
         } else {
