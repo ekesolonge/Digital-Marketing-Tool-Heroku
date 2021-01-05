@@ -8,6 +8,7 @@ const {
   getNewsletters,
   getNewsletterById,
   deleteNewsletter,
+  sendNewsletter,
 } = require("../controllers/newsletterController");
 
 // subscribe to newsletter
@@ -21,5 +22,8 @@ router.get("/:id", authenticate, getNewsletterById);
 
 // DELETE
 router.delete("/:id", authenticate, deleteNewsletter);
+
+// Send Newsletter
+router.post("/sendNewsletter", sendNewsletter);
 
 module.exports = router;

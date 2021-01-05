@@ -1,5 +1,6 @@
 const connection = require("../models/db"); // database module
 const Joi = require("joi"); // validator
+const sendMail = require("../middleware/mailer");
 
 // subscribe to newsletter
 const subscribe = (req, res, next) => {
@@ -48,6 +49,25 @@ const deleteNewsletter = (req, res, next) => {
   );
 };
 
+// Send newsletters
+const sendNewsletter = (req, res, next) => {
+  connection.query(`select * from newsletter`, (err, resp) => {
+    if (err) throw err;
+    let recipients = resp.map((x) => x.email);
+
+    sendMail(
+      "MartReach <martreach2@gmail.com>",
+      "MartReach Weekly Newsletters",
+      `${recipients}`,
+      `This is a MartReach newsletter.`,
+      (err3, info) => {
+        if (err3) return res.status(500).send(err3);
+        res.status(201).send("Newsletter sent successfully!");
+      }
+    );
+  });
+};
+
 function validateTemplate(template) {
   const schema = Joi.object({
     email: Joi.string()
@@ -66,3 +86,4 @@ module.exports.subscribe = subscribe;
 module.exports.getNewsletters = getNewsletters;
 module.exports.getNewsletterById = getNewsletterById;
 module.exports.deleteNewsletter = deleteNewsletter;
+module.exports.sendNewsletter = sendNewsletter;
