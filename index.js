@@ -1,5 +1,6 @@
 const express = require("express"); // express module
 const bodyParser = require("body-parser"); // body-parser middleware
+const cors = require("cors"); // cors
 
 const home = require("./routes/home");
 const users = require("./routes/users");
@@ -17,8 +18,17 @@ const billingInfo = require("./routes/billingInfo");
 const payment = require("./routes/payment");
 const stickyNote = require("./routes/stickyNote");
 
-const app = express(); // express init
-app.use(bodyParser.json()); // Middleware use with express
+const app = express();
+app.use(bodyParser.json());
+
+// CORS
+const corsOptions = {
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
 
 // Routes
 app.use("/", home);
