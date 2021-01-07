@@ -87,7 +87,7 @@ const createUser = (req, res, next) => {
               '${lastName}',
               '${username}',
               '${tel}',
-              '${email}',
+              '${email.toLowerCase()}',
               '${hash}',
               '${website}',
               '${picture}',
@@ -155,7 +155,9 @@ const editUser = (req, res, next) => {
             filePath = users[0].picture;
           }
 
-          let sql = `update users set firstName = '${firstName}', lastName = '${lastName}',username = '${username}',tel = '${tel}',email = '${email}',password = '${hash}',website = '${website}',picture = '${filePath}' where id = ${req.params.id}`;
+          let sql = `update users set firstName = '${firstName}', lastName = '${lastName}',username = '${username}',tel = '${tel}',email = '${email.toLowerCase()}',password = '${hash}',website = '${website}',picture = '${filePath}' where id = ${
+            req.params.id
+          }`;
           connection.query(sql, (err, db_res) => {
             if (err) return res.status(400).send(err);
             res.send(`User Updated Successfully at ID: ${req.params.id}!`);
@@ -213,7 +215,7 @@ const signup = (req, res, next) => {
               '${lastName}',
               '${username}',
               '${tel}',
-              '${email}',
+              '${email.toLowerCase()}',
               '${hash}',
               '${website}',
               '${picture}',

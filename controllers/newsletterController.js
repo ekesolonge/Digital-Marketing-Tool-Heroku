@@ -8,7 +8,7 @@ const subscribe = (req, res, next) => {
   if (error) return res.status(400).send(error.details[0].message);
 
   connection.query(
-    `insert into newsletter values('','${req.body.email}')`,
+    `insert into newsletter values('','${req.body.email.toLowerCase()}')`,
     (err, resp) => {
       if (err) return res.status(400).send(err);
       res.send("You have subscribed to MartReach newsletter successfully");
