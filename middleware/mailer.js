@@ -9,10 +9,10 @@ const transport = nodemailer.createTransport({
   },
 });
 
-const sendEmail = (from, subject, to, html, cb) => {
+const sendEmail = (from, subject, bcc, html, cb) => {
   const mailOptions = {
     from,
-    to,
+    bcc,
     subject,
     html,
   };
