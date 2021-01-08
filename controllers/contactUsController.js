@@ -1,13 +1,11 @@
 const connection = require("../models/db"); // database module
 const Joi = require("joi"); // validator
+const sendMail = require("../middleware/mailer");
 
 //POST
 const sendContact = (req, res, next) => {
   const { error } = validateTemplate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-
-  if (!req.body.tel) req.body.tel = "";
-  if (!req.body.message) req.body.message = "";
 
   // INSERT into database
   connection.query(
@@ -16,6 +14,21 @@ const sendContact = (req, res, next) => {
       if (err) return res.status(400).send(err);
       res.send(
         "Thank you for contacting us, we will get back to you as soon as possible."
+      );
+
+      sendMail(
+        `MartReach <martreach2@gmail.com>`,
+        `MartReach Contact Us Mail`,
+        `martreach2@gmail.com`,
+        `<h1>Message from ${req.body.name}</h1>
+        <p>Name: ${req.body.name}</p>
+        <p>Email: ${req.body.email}</p>
+        <p>Phone Number: ${req.body.tel}</p>
+        <p>Message: ${req.body.message}</p>`,
+        (err3, info) => {
+          if (err3) return res.status(500).send(err3);
+          return;
+        }
       );
     }
   );
