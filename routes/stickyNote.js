@@ -3,17 +3,17 @@ const router = express.Router(); // router
 const { authenticate } = require("../middleware/authorization"); // authorization middleware
 const {
   getStickyNote,
-  createStickyNote,
-  editStickyNote,
+  saveStickyNote,
+  getStickyNoteById,
 } = require("../controllers/stickyNote");
 
-// GET ALL StickyNote
+// GET StickyNote
 router.get("/", authenticate, getStickyNote);
 
-// CREATE A NEW StickyNote
-router.post("/", authenticate, createStickyNote);
+// GET StickyNote by id
+router.get("/:id", authenticate, getStickyNoteById);
 
-// EDIT StickyNote
-router.put("/:id", authenticate, editStickyNote);
+// Save StickyNote
+router.post("/", authenticate, saveStickyNote);
 
 module.exports = router;

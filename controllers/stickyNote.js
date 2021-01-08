@@ -1,7 +1,16 @@
 const connection = require("../models/db"); // database module
 
-// Get sticky note details by id
+// Get sticky notes
 const getStickyNote = (req, res) => {
+  connection.query(`select * from sticky_note`, (err, resp) => {
+    if (err || resp.length < 1)
+      return res.status(404).send("No sticky notes available");
+    res.send(resp[0]);
+  });
+};
+
+// Get sticky note details by id
+const getStickyNoteById = (req, res) => {
   connection.query(
     `select * from sticky_note where id = ${req.params.id}`,
     (err, resp) => {
@@ -13,30 +22,39 @@ const getStickyNote = (req, res) => {
 };
 
 // Create Sticky note
-const createStickyNote = (req, res) => {
-  if (!req.body.note)
-    return res.status(400).send("Please fill all required fields");
-
-  // INSERT into database
+const saveStickyNote = (req, res) => {
   connection.query(
-    `insert into sticky_note (userId,note) 
-        values('${req.user.data.userId}','${req.body.note}')`,
-    (err, res) => {
-      if (err) return res.status(400).send(err);
-      res.send("Sticky note Saved Successfully.");
-    }
-  );
-};
-
-//Edit Billing Info
-const editStickyNote = (req, res) => {
-  connection.query(
-    `update sticky_note set note = '${req.body.note}' where id=${req.params.id}`,
+    // Check if sticky note exists
+    `select * from sticky_note where userId=${req.user.data.userId}`,
     (err, response) => {
-      if (err) throw err;
-      response.send("Note Info Updated Successfully");
+      if (err) return res.status(400).send("Internal Server Error");
+
+      if (!req.body.note) req.body.note = "";
+
+      // if sticky note doesn't exist
+      if (response.length < 1) {
+        // Create new sticky note
+        connection.query(
+          `insert into sticky_note (userId,note)
+        values('${req.user.data.userId}','${req.body.note}')`,
+          (err, resp) => {
+            if (err) return res.status(400).send("Internal Server Error");
+            res.send("Sticky Note Created Successfully.");
+          }
+        );
+      } // if sticky note doesn't exists
+      else {
+        // Update sticky note
+        connection.query(
+          `update sticky_note set note = '${req.body.note}' where userId=${req.user.data.userId}`,
+          (err, response) => {
+            if (err) return res.status(400).send("Internal Server Error");
+            res.send("Sticky Note Updated Successfully");
+          }
+        );
+      }
     }
   );
 };
 
-module.exports = { getStickyNote, createStickyNote, editStickyNote };
+module.exports = { getStickyNote, saveStickyNote, getStickyNoteById };
