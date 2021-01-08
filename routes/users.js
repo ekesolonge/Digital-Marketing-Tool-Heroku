@@ -31,7 +31,7 @@ router.delete("/:id", authenticate, manageUser, deleteUser);
 router.post("/", authenticate, manageUser, createUser);
 
 // EDIT USER
-router.put("/:id", authenticate, manageUser, upload.single("image"), editUser);
+router.put("/:id", authenticate, upload.single("image"), editUser);
 
 // SIGNUP
 router.post("/signup", signup);
