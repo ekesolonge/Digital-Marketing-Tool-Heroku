@@ -1,5 +1,6 @@
 const connection = require("../models/db"); // database module
 const Joi = require("joi"); // validator
+const sendMail = require("../middleware/mailer");
 
 // get emailTemplates
 const getEmailTemplates = (req, res, next) => {
@@ -23,12 +24,14 @@ const getEmailTemplateById = (req, res, next) => {
 
 // Create new emailTemplate
 const createEmailTemplate = (req, res, next) => {
-  const { error } = validateTemplate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  let { tempName, json, html } = req.body;
+
+  let jsonContent = JSON.stringify(json);
 
   // INSERT into database
   connection.query(
-    `insert into email_templates (user_id,name,json,html) values('${req.user.data.userId}','${req.body.name}','${req.body.json}','${req.body.html}')`,
+    `insert into email_templates (user_id,name,json,html) values('${req.user.data.userId}','${tempName}',?,?)`,
+    [jsonContent, html],
     (err, resp) => {
       if (err) return res.status(400).send(err);
       res.send("Email Template created successfully.");
@@ -87,15 +90,21 @@ const deleteEmailTemplate = (req, res, next) => {
   );
 };
 
-function validateTemplate(template) {
-  const schema = Joi.object({
-    name: Joi.string().min(3).required(),
-    json: Joi.string().empty("").required(),
-    html: Joi.string().empty("").required(),
-  });
+// Test emailTemplate
+const testEmailTemplate = (req, res, next) => {
+  let { senderName, html, email } = req.body;
 
-  return schema.validate(template);
-}
+  sendMail(
+    "MartReach <martreach2@gmail.com>",
+    `MartReach Email Template Test Mail by ${senderName}`,
+    `${email}`,
+    `${html}`,
+    (err3, info) => {
+      if (err3) return res.status(500).send(err3);
+      res.status(201).send("Email Template sent successfully");
+    }
+  );
+};
 
 // Export functions
 module.exports.getEmailTemplates = getEmailTemplates;
@@ -103,3 +112,4 @@ module.exports.getEmailTemplateById = getEmailTemplateById;
 module.exports.createEmailTemplate = createEmailTemplate;
 module.exports.editEmailTemplate = editEmailTemplate;
 module.exports.deleteEmailTemplate = deleteEmailTemplate;
+module.exports.testEmailTemplate = testEmailTemplate;

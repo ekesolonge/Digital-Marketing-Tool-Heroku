@@ -9,6 +9,7 @@ const {
   createEmailTemplate,
   editEmailTemplate,
   deleteEmailTemplate,
+  testEmailTemplate,
 } = require("../controllers/emailTemplateController");
 
 // GET EMAIL TEMPLATES
@@ -25,5 +26,8 @@ router.put("/:id", authenticate, editEmailTemplate);
 
 // DELETE EMAIL TEMPLATE
 router.delete("/:id", authenticate, deleteEmailTemplate);
+
+// TEST EMAIL TEMPLATE
+router.post("/testMail", authenticate, testEmailTemplate);
 
 module.exports = router;
