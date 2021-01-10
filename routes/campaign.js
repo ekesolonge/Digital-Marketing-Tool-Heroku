@@ -7,6 +7,7 @@ const {
   deleteCampaign,
   createCampaign,
   editCampaign,
+  sendCampaign,
 } = require("../controllers/campaignController");
 
 // GET ALL Campaign
@@ -23,5 +24,8 @@ router.post("/", authenticate, createCampaign);
 
 // EDIT Campaign
 router.put("/:id", authenticate, editCampaign);
+
+// Send Campaign
+router.post("/sendCampaign/:id", authenticate, sendCampaign);
 
 module.exports = router;
