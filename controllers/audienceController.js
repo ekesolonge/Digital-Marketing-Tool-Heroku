@@ -85,7 +85,7 @@ const editAudience = (req, res) => {
       if (audience == undefined)
         return res.status(401).send("Cannot edit audience you didn't create");
       connection.query(
-        `update audience set firstName = '${req.body.firstName}', lastName = '${req.body.lastName}', tel='${req.body.tel}', email='${req.body.email}',
+        `update audience set subscriberGroup ='${req.body.subscriberGroup}' ,firstName = '${req.body.firstName}', lastName = '${req.body.lastName}', tel='${req.body.tel}', email='${req.body.email}',
          country='${req.body.country}', state='${req.body.state}', city='${req.body.city}', birthday='${req.body.birthday}' where id=${req.params.id}`,
         (err, response) => {
           if (err) throw err;
