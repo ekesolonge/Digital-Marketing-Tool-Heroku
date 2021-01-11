@@ -24,7 +24,7 @@ app.use(bodyParser.json());
 // CORS
 const corsOptions = {
   origin: "*",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
   optionsSuccessStatus: 204,
 };
 
