@@ -38,7 +38,7 @@ const deleteUser = (req, res, next) => {
       if (resp.affectedRows < 1)
         return res.status(400).send("Record doesn't exist");
       if (err) return res.send(err);
-      res.send("User successfully deleted at ID " + req.params.id);
+      res.send("User successfully deleted.");
     }
   );
 };
@@ -68,7 +68,7 @@ const createUser = (req, res, next) => {
   connection.query(
     `select * from users where username = '${username}' OR email = '${email}'`,
     (err, resp) => {
-      if (err) return res.status(400).send({ message: err.sqlMessage });
+      if (err) return res.status(400).json({ message: err.sqlMessage });
 
       if (resp.length > 0) {
         if (username === resp[0].username)
@@ -160,7 +160,7 @@ const editUser = (req, res, next) => {
           }`;
           connection.query(sql, (err, db_res) => {
             if (err) return res.status(400).send(err);
-            res.send(`User Updated Successfully at ID: ${req.params.id}!`);
+            res.send(`User Updated Successfully.`);
           });
         });
       }
@@ -351,7 +351,7 @@ const resetPassword = (req, res, next) => {
               (err3, info) => {
                 if (err3) return res.status(500).send(err3);
                 res
-                  .status(201)
+                  .status(200)
                   .send(
                     "Password reset requested! Please, check your mail and reset your password!"
                   );
@@ -380,7 +380,9 @@ const handleResetPassword = (req, res) => {
       }
       if (resp.length > 0) {
         if (resp[0].otp == otpCode) {
-          return res.status(200).json({ userId: userId, status: "Verified" });
+          return res
+            .status(200)
+            .json({ userId: userId, status: "Verified", otp: otpCode });
         } else {
           return res.status(401).json({ message: "Error resetting password!" });
         }
@@ -411,7 +413,7 @@ const setPassword = (req, res) => {
                 if (err2) {
                   return res.status(422).json({ message: "Internal error" });
                 }
-                return res.status(201).send("Password reset successful");
+                return res.status(200).send("Password reset successful");
               }
             );
           });
@@ -459,7 +461,7 @@ const activateAccount = (req, res) => {
                 return res.status(422).json({ message: "Internal error" });
               }
               return res
-                .status(201)
+                .status(200)
                 .redirect(
                   "https://md-ameenu.github.io/DIGITAL-MARKETING-TOOL-REACT-MIGRATION-/#/"
                 );

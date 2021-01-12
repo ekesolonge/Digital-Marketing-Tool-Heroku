@@ -24,6 +24,6 @@ router.get("/:id", authenticate, getNewsletterById);
 router.delete("/:id", authenticate, deleteNewsletter);
 
 // Send Newsletter
-router.post("/sendNewsletter", sendNewsletter);
+router.post("/sendNewsletter", authenticate, sendNewsletter);
 
 module.exports = router;

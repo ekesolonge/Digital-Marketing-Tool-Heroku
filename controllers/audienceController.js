@@ -33,7 +33,7 @@ const deleteAudience = (req, res) => {
         `delete from audience where id = ${req.params.id}`,
         (err, resp) => {
           if (err) return res.send(err);
-          res.send("audience successfully deleted at ID " + req.params.id);
+          res.send("audience successfully deleted");
         }
       );
     }
