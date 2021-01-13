@@ -1,6 +1,7 @@
 const connection = require("../models/db"); // database module
 const Joi = require("joi"); // validator
 const sendMail = require("../middleware/mailer");
+const fetch = require("node-fetch");
 
 // get emailTemplates
 const getEmailTemplates = (req, res, next) => {
@@ -28,15 +29,46 @@ const createEmailTemplate = (req, res, next) => {
 
   let jsonContent = JSON.stringify(json);
 
-  // INSERT into database
-  connection.query(
-    `insert into email_templates (user_id,name,json,html) values('${req.user.data.userId}','${tempName}',?,?)`,
-    [jsonContent, html],
-    (err, resp) => {
-      if (err) return res.status(400).send(err);
-      res.send("Email Template created successfully.");
-    }
-  );
+  let urlImage = "https://api.unlayer.com/v2/export/image";
+  let urlPDF = "https://api.unlayer.com/v2/export/pdf";
+
+  // Convert API key to base64 first
+  const token = Buffer.from(
+    "IQQY9yYHEO4BQZG7cDu00qownOld7LNkhDi7CkPGJrr4zpizjF5xwKUQp6Nj7CBi:"
+  ).toString("base64");
+
+  let options = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Basic ${token}`,
+    },
+    body: JSON.stringify({
+      displayMode: "email",
+      design: json,
+    }),
+  };
+
+  Promise.all([fetch(urlImage, options), fetch(urlPDF, options)])
+    .then(async ([img, pdf]) => {
+      const image = await img.json();
+      const PDF = await pdf.json();
+      return [image, PDF];
+    })
+    .then((responseText) => {
+      // INSERT into database
+      connection.query(
+        `insert into email_templates (user_id,name,json,html,image,pdf) values('${req.user.data.userId}','${tempName}',?,?,?,?)`,
+        [jsonContent, html, responseText[0].data.url, responseText[1].data.url],
+        (err, resp) => {
+          if (err) return res.status(400).send("Internal Server Error");
+          res.send("Email Template created successfully.");
+        }
+      );
+    })
+    .catch((err) => {
+      res.status(400).send("Internal Server Error");
+    });
 };
 
 // Edit emailTemplates
