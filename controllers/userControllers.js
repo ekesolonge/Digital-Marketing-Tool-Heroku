@@ -10,21 +10,22 @@ const randomstring = require("randomstring");
 
 // GET USERS
 const getUsers = (req, res, next) => {
-  connection.query(`select * from users`, (err, resp) => {
-    if (err) throw err;
-    resp.map((x) => delete x.password);
-    res.send(resp);
-  });
+  connection.query(
+    `select users.id,user_role.roleId,role.roleName, firstName, lastName, username,tel,email,website,picture,otp,isEnabled,users.dateCreated from users inner join user_role on users.id = user_role.userId INNER join role on role.id = user_role.roleId`,
+    (err, resp) => {
+      if (err) throw err;
+      res.send(resp);
+    }
+  );
 };
 
 // GET USERS BY ID
 const getUserById = (req, res, next) => {
   connection.query(
-    `select * from users where id = ${req.params.id}`,
+    `select users.id,user_role.roleId,role.roleName, firstName, lastName, username,tel,email,website,picture,otp,isEnabled,users.dateCreated from users inner join user_role on users.id = user_role.userId INNER join role on role.id = user_role.roleId where users.id = ${req.params.id}`,
     (err, resp) => {
       if (err || resp.length < 1)
         return res.status(404).send("Record does not exist.");
-      delete resp[0].password;
       res.send(resp[0]);
     }
   );
