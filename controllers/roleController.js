@@ -26,7 +26,7 @@ const deleteRole = (req, res, next) => {
     `delete from role where id = ${req.params.id}`,
     (err, resp) => {
       if (err) return res.send(err);
-      res.send("role successfully deleted at ID " + req.params.id);
+      res.send("role successfully deleted");
     }
   );
 };

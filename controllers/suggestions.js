@@ -18,7 +18,7 @@ const createSuggestions = (req, res) => {
     `insert into suggestions (userId,category,message) values('${req.user.data.userId}','${req.body.category}','${req.body.message}')`,
     (err, resp) => {
       if (err) return res.status(400).send(err);
-      res.send("Suggestion received successfully.");
+      res.send("Suggestion Sent successfully.");
     }
   );
 };

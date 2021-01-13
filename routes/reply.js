@@ -7,6 +7,6 @@ const { getReply, createReply } = require("../controllers/reply");
 router.get("/", authenticate, getReply);
 
 // CREATE A NEW Reply
-router.post("/", authenticate, createReply);
+router.post("/:id", authenticate, createReply);
 
 module.exports = router;

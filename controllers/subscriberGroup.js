@@ -33,9 +33,7 @@ const deleteSubscriberGroup = (req, res) => {
         `delete from subscriber_group where id = ${req.params.id}`,
         (err, resp) => {
           if (err) return res.send(err);
-          res.send(
-            "subscriber_group successfully deleted at ID " + req.params.id
-          );
+          res.send("subscriber group successfully deleted");
         }
       );
     }

@@ -3,7 +3,7 @@ const connection = require("../models/db");
 // Get permission API
 const getPermissions = (req, res, next) => {
   connection.query(`select * from permission`, (err, resp) => {
-    if (err) throw err;
+    if (err) return res.status(400).send("Internal Server Error");
     res.send(resp);
   });
 };
@@ -25,7 +25,7 @@ const deletePermission = (req, res, next) => {
     `delete from permission where id = ${req.params.id}`,
     (err, resp) => {
       if (err) return res.send(err);
-      res.send("permission successfully deleted at ID " + req.params.id);
+      res.send("permission successfully deleted");
     }
   );
 };
@@ -38,6 +38,18 @@ const createPermission = (req, res, next) => {
     !req.body.groupName
   )
     return res.status(400).send("Please fill all required fields");
+
+  connection.query(
+    `insert into permission (permissionName,permissionDescription,groupName) values 
+              ('${req.body.permissionName}',
+              '${req.body.permissionDescription}',
+              '${req.body.groupName}')`,
+    (error, resp) => {
+      if (error) return res.status(400).send("Internal Server Error");
+      res.send("permission successfully created.");
+      res.end();
+    }
+  );
 };
 
 //rest api to update permission into mysql database
@@ -45,7 +57,7 @@ const editPermission = (req, res, next) => {
   connection.query(
     `update permission set permissionName = '${req.body.permissionName}', permissionDescription = '${req.body.permissionDescription}',groupName = '${req.body.groupName}' where id=${req.params.id}`,
     (err, response) => {
-      if (err) throw err;
+      if (err) return res.status(400).send("Internal Server Error");
       res.send("permission edited Successfully");
     }
   );
@@ -62,7 +74,7 @@ const assignPermission = (req, res, next) => {
               ('','${roleId}',
               '${permissionId}')`,
     (error, resp1) => {
-      if (error) return res.send(error.sqlMessage);
+      if (error) return res.status(400).send("Internal Server Error");
       res.send(
         `Permission ID ${permissionId} has been assigned to role ID ${roleId}`
       );

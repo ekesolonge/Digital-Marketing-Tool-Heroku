@@ -32,8 +32,8 @@ const deleteCampaign = (req, res) => {
       connection.query(
         `delete from campaign where id = ${req.params.id}`,
         (err, resp) => {
-          if (err) return res.send(err);
-          res.send("campaign successfully deleted at ID " + req.params.id);
+          if (err) return res.status(400).send("Internal Server Error");
+          res.send("campaign successfully deleted");
         }
       );
     }
@@ -45,17 +45,39 @@ const createCampaign = (req, res) => {
   if (!req.body.name || !req.body.subscriberGroup || !req.body.emailTemplate)
     return res.status(400).send("Please fill all required fields");
 
-  // INSERT into database
   connection.query(
-    `insert into campaign (name,subscriberGroup,emailTemplate,createdBy) values 
+    `select subscriber_group.id as subscriberGroupID,email_templates.id as emailTemplateID, userId FROM subscriber_group INNER join email_templates on userId = user_id where userId = ${req.user.data.userId}`,
+    (error, resp) => {
+      if (resp.length < 1)
+        return res
+          .status(404)
+          .send("User has no email templates or subscriber groups yet");
+
+      let emailTemplate = resp.find(
+        (x) => x.subscriberGroupID == req.body.subscriberGroup
+      );
+      let subscriberGroup = resp.find(
+        (x) => x.emailTemplateID == req.body.emailTemplate
+      );
+
+      if (emailTemplate == undefined || subscriberGroup == undefined)
+        return res
+          .status(404)
+          .send("Email Template or Subscriber doesn't exist");
+
+      // INSERT into database
+      connection.query(
+        `insert into campaign (name,subscriberGroup,emailTemplate,createdBy) values
                   ('${req.body.name}',
                   '${req.body.subscriberGroup}',
                   '${req.body.emailTemplate}',
                   '${req.user.data.userId}')`,
-    (error, resp) => {
-      if (error) return res.send("Internal Server Error");
-      res.send("campaign successfully created.");
-      res.end();
+        (error, resp) => {
+          if (error) return res.send("Internal Server Error");
+          res.send("campaign successfully created.");
+          res.end();
+        }
+      );
     }
   );
 };
@@ -68,11 +90,34 @@ const editCampaign = (req, res) => {
       let campaign = resp.find((x) => x.id == req.params.id);
       if (campaign == undefined)
         return res.status(401).send("Cannot edit campaign you didn't create");
+
       connection.query(
-        `update campaign set name = '${req.body.name}',name = '${req.body.subscriberGroup}',name = '${req.body.emailTemplate}' where id=${req.params.id}`,
-        (err, response) => {
-          if (err) return res.status(400).send("Internal server error");
-          res.send("campaign edited Successfully");
+        `select subscriber_group.id as subscriberGroupID,email_templates.id as emailTemplateID, userId FROM subscriber_group INNER join email_templates on userId = user_id where userId = ${req.user.data.userId}`,
+        (error, resp) => {
+          if (resp.length < 1)
+            return res
+              .status(404)
+              .send("User has no email templates or subscriber groups yet");
+
+          let emailTemplate = resp.find(
+            (x) => x.subscriberGroupID == req.body.subscriberGroup
+          );
+          let subscriberGroup = resp.find(
+            (x) => x.emailTemplateID == req.body.emailTemplate
+          );
+
+          if (emailTemplate == undefined || subscriberGroup == undefined)
+            return res
+              .status(404)
+              .send("Email Template or Subscriber doesn't exist");
+
+          connection.query(
+            `update campaign set name = '${req.body.name}',subscriberGroup = '${req.body.subscriberGroup}',emailTemplate = '${req.body.emailTemplate}',dateCreated = current_timestamp() where id=${req.params.id}`,
+            (err, response) => {
+              if (err) return res.status(400).send("Internal server error");
+              res.send("campaign edited Successfully");
+            }
+          );
         }
       );
     }
