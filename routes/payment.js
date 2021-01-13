@@ -3,7 +3,6 @@ const router = express.Router(); // router
 const { authenticate } = require("../middleware/authorization"); // authorization middleware
 const {
   getPayment,
-  getPaymentById,
   createPlan,
   makePayment,
   verifyPayment,
@@ -11,9 +10,6 @@ const {
 
 // GET ALL Payment
 router.get("/", authenticate, getPayment);
-
-// GET Payment by Id
-router.get("/:id", authenticate, getPaymentById);
 
 //Create New Plan
 router.post("/create-plan", authenticate, createPlan);

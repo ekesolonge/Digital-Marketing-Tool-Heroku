@@ -13,18 +13,6 @@ const getPayment = (req, res) => {
   });
 };
 
-// Get payment details by id
-const getPaymentById = (req, res) => {
-  connection.query(
-    `select * from payment where id = ${req.params.id}`,
-    (err, resp) => {
-      if (err || resp.length < 1)
-        return res.status(404).send("Payment Details does not exist.");
-      res.send(resp[0]);
-    }
-  );
-};
-
 // Payment Plan Creation
 const createPlan = (req, res) => {
   const { amount, name, interval, duration, description } = req.body;
@@ -71,7 +59,7 @@ const makePayment = (req, res) => {
   connection.query(
     `select package_amount, pid from packages where package_id = ${plan_id}`,
     (error, response) => {
-      if (error) return res.status(400).send(error);
+      if (error) return res.status(400).send("Internal Server Error");
       let amount = response[0].package_amount;
       let packageID = response[0].pid;
 
@@ -103,7 +91,7 @@ const makePayment = (req, res) => {
           connection.query(
             `insert into payment (userID, tx_ref, package_id, amount, status) values ('${userID}', '${tx_ref}', '${packageID}', '${amount}', 'pending')`,
             (err, resp) => {
-              if (err) return res.status(400).send(err);
+              if (err) return res.status(400).send("Internal Server Error");
               res.status(200).send(json);
             }
           );
@@ -265,7 +253,6 @@ const verifyPayment = (req, res) => {
 
 module.exports = {
   getPayment,
-  getPaymentById,
   createPlan,
   makePayment,
   verifyPayment,
