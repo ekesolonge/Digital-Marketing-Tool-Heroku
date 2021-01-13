@@ -71,12 +71,12 @@ const makePayment = (req, res) => {
   connection.query(
     `select package_amount, pid from packages where package_id = ${plan_id}`,
     (error, response) => {
-      if (error) return res.status(400).send("Internal Server Error");
+      if (error) return res.status(400).send(error);
       let amount = response[0].package_amount;
       let packageID = response[0].pid;
 
       if (!amount || !packageID)
-        return res.status(400).send("Internal Server Error");
+        return res.status(400).send("Invalid Package Selected");
 
       fetch(`${process.env.PAYMENT_API_URL}/payments`, {
         method: "POST",
@@ -103,7 +103,7 @@ const makePayment = (req, res) => {
           connection.query(
             `insert into payment (userID, tx_ref, package_id, amount, status) values ('${userID}', '${tx_ref}', '${packageID}', '${amount}', 'pending')`,
             (err, resp) => {
-              if (err) return res.status(400).send("Internal Server Error");
+              if (err) return res.status(400).send(err);
               res.status(200).send(json);
             }
           );
