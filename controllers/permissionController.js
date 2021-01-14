@@ -24,7 +24,7 @@ const deletePermission = (req, res, next) => {
   connection.query(
     `delete from permission where id = ${req.params.id}`,
     (err, resp) => {
-      if (err) return res.send(err);
+      if (err) return res.status(400).send("Internal Server Error");
       res.send("permission successfully deleted");
     }
   );

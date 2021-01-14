@@ -2,11 +2,14 @@ const connection = require("../models/db"); // database module
 
 // Get sticky notes
 const getStickyNote = (req, res) => {
-  connection.query(`select * from sticky_note`, (err, resp) => {
-    if (err || resp.length < 1)
-      return res.status(404).send("No sticky notes available");
-    res.send(resp);
-  });
+  connection.query(
+    `select * from sticky_note where userId=${req.user.data.userId}`,
+    (err, resp) => {
+      if (err || resp.length < 1)
+        return res.status(404).send("No sticky notes available");
+      res.send(resp);
+    }
+  );
 };
 
 // Get sticky note details by id

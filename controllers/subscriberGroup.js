@@ -2,10 +2,13 @@ const connection = require("../models/db");
 
 // Get subscriber_group API
 const getSubscriberGroup = (req, res) => {
-  connection.query(`select * from subscriber_group`, (err, resp) => {
-    if (err) throw err;
-    res.send(resp);
-  });
+  connection.query(
+    `select * from subscriber_group where userId=${req.user.data.userId}`,
+    (err, resp) => {
+      if (err) return res.status(400).send("Internal Server Error");
+      res.send(resp);
+    }
+  );
 };
 
 const getSubscriberGroupById = (req, res) => {
@@ -32,7 +35,7 @@ const deleteSubscriberGroup = (req, res) => {
       connection.query(
         `delete from subscriber_group where id = ${req.params.id}`,
         (err, resp) => {
-          if (err) return res.send(err);
+          if (err) return res.status(400).send("Internal Server Error");
           res.send("subscriber group successfully deleted");
         }
       );
@@ -51,7 +54,7 @@ const createSubscriberGroup = (req, res) => {
                 ('${req.body.name}',
                 '${req.user.data.userId}')`,
     (error, resp) => {
-      if (error) return res.send(error.sqlMessage);
+      if (error) return res.status(400).send("Internal Server Error");
       res.send("subscriber group successfully created.");
       res.end();
     }
@@ -71,7 +74,7 @@ const editSubscriberGroup = (req, res) => {
       connection.query(
         `update subscriber_group set name = '${req.body.name}' where id=${req.params.id}`,
         (err, response) => {
-          if (err) throw err;
+          if (err) return res.status(400).send("Internal Server Error");
           res.send("subscriber group edited Successfully");
         }
       );

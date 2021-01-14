@@ -3,11 +3,15 @@ const sendMail = require("../middleware/mailer");
 
 // Get campaign API
 const getCampaign = (req, res) => {
-  connection.query(`select * from campaign`, (err, resp) => {
-    if (err || resp.length < 1)
-      return res.status(404).send("Record does not exist.");
-    res.send(resp);
-  });
+  connection.query(
+    `select * from campaign where createdBy=${req.user.data.userId}`,
+    (err, resp) => {
+      if (err) return res.status(400).send("Internal Server Error");
+      if (resp.length < 1)
+        return res.status(404).send("Record does not exist.");
+      res.send(resp);
+    }
+  );
 };
 
 const getCampaignById = (req, res) => {
@@ -73,7 +77,7 @@ const createCampaign = (req, res) => {
                   '${req.body.emailTemplate}',
                   '${req.user.data.userId}')`,
         (error, resp) => {
-          if (error) return res.send("Internal Server Error");
+          if (error) return res.status(400).send("Internal Server Error");
           res.send("campaign successfully created.");
           res.end();
         }
@@ -146,7 +150,7 @@ const sendCampaign = (req, res, next) => {
         `${recipients}`,
         `${resp[0].html}`,
         (err3, info) => {
-          if (err3) return res.status(500).send(err3);
+          if (err3) return res.status(400).send("Internal Server Error");
           res.status(201).send("Campaign sent successfully!");
         }
       );

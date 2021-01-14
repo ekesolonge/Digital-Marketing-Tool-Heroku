@@ -13,7 +13,7 @@ const getUsers = (req, res, next) => {
   connection.query(
     `select users.id,user_role.roleId,role.roleName, firstName, lastName, username,tel,email,website,picture,otp,isEnabled,users.dateCreated from users inner join user_role on users.id = user_role.userId INNER join role on role.id = user_role.roleId`,
     (err, resp) => {
-      if (err) throw err;
+      if (err) return res.status(400).send("Internal Server Error");
       res.send(resp);
     }
   );
@@ -38,7 +38,7 @@ const deleteUser = (req, res, next) => {
     (err, resp) => {
       if (resp.affectedRows < 1)
         return res.status(400).send("Record doesn't exist");
-      if (err) return res.send(err);
+      if (err) return res.status(400).send("Internal Server Error");
       res.send("User successfully deleted.");
     }
   );
@@ -69,7 +69,7 @@ const createUser = (req, res, next) => {
   connection.query(
     `select * from users where username = '${username}' OR email = '${email}'`,
     (err, resp) => {
-      if (err) return res.status(400).json({ message: err.sqlMessage });
+      if (err) return res.status(400).send("Internal Server Error");
 
       if (resp.length > 0) {
         if (username === resp[0].username)
@@ -79,7 +79,7 @@ const createUser = (req, res, next) => {
       } else {
         // Hash password
         bcrypt.hash(password, 10, (err, hash) => {
-          if (err) return res.send(err);
+          if (err) return res.status(400).send("Internal Server Error");
 
           // INSERT into database
           connection.query(
@@ -94,7 +94,7 @@ const createUser = (req, res, next) => {
               '${picture}',
               'true')`,
             (error, resp2) => {
-              if (error) return res.send(error.sqlMessage);
+              if (error) return res.status(400).send("Internal Server Error");
               res.send("User successfully created.");
               defaultRole(resp2.insertId); // assigns user role to new users
               res.end();
@@ -146,7 +146,7 @@ const editUser = (req, res, next) => {
 
         // Hash password
         bcrypt.hash(password, 10, (err, hash) => {
-          if (err) return res.send(err);
+          if (err) return res.status(400).send("Internal Server Error");
 
           // Store Path of image uploaded
           var filePath;
@@ -160,7 +160,7 @@ const editUser = (req, res, next) => {
             req.params.id
           }`;
           connection.query(sql, (err, db_res) => {
-            if (err) return res.status(400).send(err);
+            if (err) return res.status(400).send("Internal Server Error");
             res.send(`User Updated Successfully.`);
           });
         });
@@ -195,7 +195,7 @@ const signup = (req, res, next) => {
   connection.query(
     `select * from users where username = '${username}' OR email = '${email}'`,
     (err, resp) => {
-      if (err) return res.status(400).json({ message: err.sqlMessage });
+      if (err) return res.status(400).send("Internal Server Error");
 
       if (resp.length > 0) {
         if (username === resp[0].username)
@@ -205,7 +205,7 @@ const signup = (req, res, next) => {
       } else {
         // Hash password
         bcrypt.hash(password, 10, (err, hash) => {
-          if (err) return res.send(err);
+          if (err) return res.status(400).send("Internal Server Error");
 
           const otpCode = randomstring.generate();
 
@@ -223,7 +223,7 @@ const signup = (req, res, next) => {
               '${otpCode}',
               'false')`,
             (error, resp2) => {
-              if (error) return res.send(error.sqlMessage);
+              if (error) return res.status(400).send("Internal Server Error");
 
               const encodedUserId = encodeURIComponent(
                 Buffer.from(`${resp2.insertId}`, "binary").toString("base64")
@@ -242,7 +242,8 @@ const signup = (req, res, next) => {
                         <a href="${process.env.BASE_URL}/api/users/auth/activation/${encodedUserId}/${encodedOtpCode}">${process.env.BASE_URL}/api/users/auth/activation/${encodedUserId}/${encodedOtpCode}}</a></p>
                         <br/>`,
                 (err3, info) => {
-                  if (err3) return res.status(500).send(err3);
+                  if (err3)
+                    return res.status(500).send("Internal Server Error");
                   res
                     .status(201)
                     .send(
@@ -285,7 +286,7 @@ const login = (req, res, next) => {
           connection.query(
             `select permissionName,groupName from permission inner join role_permission on permission.id = role_permission.permissionId where role_permission.roleId = ${resp[0].roleId}`,
             (err, resPerm) => {
-              if (err) return res.status(401).send(err);
+              if (err) return res.status(400).send("Internal Server Error");
               resp[0].permissions = resPerm;
               delete resp[0].password;
 
@@ -325,7 +326,7 @@ const resetPassword = (req, res, next) => {
   connection.query(
     `SELECT * FROM users WHERE email = '${req.body.email}'`,
     (err, resp) => {
-      if (err) return res.status(422).json({ message: "internal error" });
+      if (err) return res.status(400).send("Internal Server Error");
       if (resp.length < 1)
         return res.status(422).json({ message: "invalid email supplied" });
       else {
@@ -350,7 +351,7 @@ const resetPassword = (req, res, next) => {
                     <br/>
                     Please, ignore and this mail if you did not make the request! Thanks.`,
               (err3, info) => {
-                if (err3) return res.status(500).send(err3);
+                if (err3) return res.status(500).send("Internal Server Error");
                 res
                   .status(200)
                   .send(
@@ -377,7 +378,7 @@ const handleResetPassword = (req, res) => {
     `SELECT email, otp, isEnabled FROM users WHERE id = ${userId}`,
     (err, resp) => {
       if (err) {
-        return res.status(422).json({ message: "Internal Error!" });
+        return res.status(400).send("Internal Server Error");
       }
       if (resp.length > 0) {
         if (resp[0].otp == otpCode) {

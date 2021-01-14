@@ -26,7 +26,7 @@ const sendContact = (req, res, next) => {
         <p>Phone Number: ${req.body.tel}</p>
         <p>Message: ${req.body.message}</p>`,
         (err3, info) => {
-          if (err3) return res.status(500).send(err3);
+          if (err3) return res.status(400).send("Internal Server Error");
           return;
         }
       );
@@ -37,7 +37,7 @@ const sendContact = (req, res, next) => {
 // GET
 const getContacts = (req, res, next) => {
   connection.query(`select * from contact_us`, (err, resp) => {
-    if (err) throw err;
+    if (err) return res.status(400).send("Internal Server Error");
     res.send(resp);
   });
 };
@@ -61,7 +61,7 @@ const deleteContact = (req, res, next) => {
     (err, resp) => {
       if (resp.affectedRows === 0)
         return res.status(404).send("Record does not exist.");
-      if (err) return res.send(err);
+      if (err) return res.status(400).send("Internal Server Error");
       res.send("Record successfully deleted.");
     }
   );

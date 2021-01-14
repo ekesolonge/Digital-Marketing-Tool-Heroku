@@ -4,10 +4,13 @@ const csv = require("csv-parser");
 
 // Get audience API
 const getAudience = (req, res) => {
-  connection.query(`select * from audience`, (err, resp) => {
-    if (err) throw err;
-    res.send(resp);
-  });
+  connection.query(
+    `select * from audience where user_id=${req.user.data.userId}`,
+    (err, resp) => {
+      if (err) return res.status(400).send("Internal Server Error");
+      res.send(resp);
+    }
+  );
 };
 
 const getAudienceById = (req, res) => {
@@ -32,7 +35,7 @@ const deleteAudience = (req, res) => {
       connection.query(
         `delete from audience where id = ${req.params.id}`,
         (err, resp) => {
-          if (err) return res.send(err);
+          if (err) return res.status(400).send("Internal Server Error");
           res.send("audience successfully deleted");
         }
       );
@@ -69,7 +72,7 @@ const createAudience = (req, res) => {
               '${req.body.city}',
               '${req.body.birthday}')`,
     (error, resp) => {
-      if (error) return res.send(error.sqlMessage);
+      if (error) return res.status(400).send("Internal Server Error");
       res.send("audience successfully created.");
       res.end();
     }
@@ -88,7 +91,7 @@ const editAudience = (req, res) => {
         `update audience set subscriberGroup ='${req.body.subscriberGroup}' ,firstName = '${req.body.firstName}', lastName = '${req.body.lastName}', tel='${req.body.tel}', email='${req.body.email}',
          country='${req.body.country}', state='${req.body.state}', city='${req.body.city}', birthday='${req.body.birthday}' where id=${req.params.id}`,
         (err, response) => {
-          if (err) throw err;
+          if (err) return res.status(400).send("Internal Server Error");
           res.send("audience edited Successfully");
         }
       );
@@ -126,7 +129,7 @@ const importContacts = (req, res) => {
       connection.query(
         `insert into audience (user_id,subscriberGroup,firstName,lastName,tel,email,country,state,city,birthday) ${finalValue}`,
         (dbErr, resp) => {
-          if (dbErr) return res.status(400).send(dbErr);
+          if (dbErr) return res.status(400).send("Internal Server Error");
           res.send("Contacts Imported Successfully");
         }
       );

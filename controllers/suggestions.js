@@ -3,7 +3,7 @@ const connection = require("../models/db"); // database module
 // Get Suggestion
 const getSuggestions = (req, res) => {
   connection.query(`select * from suggestions`, (err, resp) => {
-    if (err) throw err;
+    if (err) return res.status(400).send("Internal Server Error");
     res.send(resp);
   });
 };
@@ -17,7 +17,7 @@ const createSuggestions = (req, res) => {
   connection.query(
     `insert into suggestions (userId,category,message) values('${req.user.data.userId}','${req.body.category}','${req.body.message}')`,
     (err, resp) => {
-      if (err) return res.status(400).send(err);
+      if (err) return res.status(400).send("Internal Server Error");
       res.send("Suggestion Sent successfully.");
     }
   );

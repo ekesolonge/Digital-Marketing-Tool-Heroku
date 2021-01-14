@@ -17,7 +17,7 @@ const createBillingInfo = (req, res) => {
     `insert into billing_info (userId,transactionId,billingContactName,billingContactName,billingAddress,billingPhoneNumber,billingEmailAddress) 
         values('${req.user.data.userId}','${req.body.transactionId}','${req.body.billingContactName}',${req.body.billingCompanyName}','${req.body.billingAddress}','${req.body.billingPhoneNumber}','${req.body.billingEmailAddress}')`,
     (err, res) => {
-      if (err) return res.status(400).send(err);
+      if (err) return res.status(400).send("Internal Server Error");
       res.send("Billing Info Saved Successfully.");
     }
   );
@@ -28,7 +28,7 @@ const editBillingInfo = (req, res) => {
   connection.query(
     `update billing_info set userId = '${req.user.data.userId}', billingContactName = '${req.body.billingContactName}', billingCompanyName = '${req.body.billingCompanyName}', billingAddress='${req.body.billingAddress}', billingPhoneNumber='${req.body.billingPhoneNumber}', billingEmailAddress='${req.body.billingEmailAddress}' where id=${req.params.id}`,
     (err, response) => {
-      if (err) throw err;
+      if (err) return res.status(400).send("Internal Server Error");
       response.send("Billing Info Updated Successfully");
     }
   );

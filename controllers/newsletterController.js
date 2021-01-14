@@ -10,7 +10,7 @@ const subscribe = (req, res, next) => {
   connection.query(
     `insert into newsletter values('','${req.body.email.toLowerCase()}')`,
     (err, resp) => {
-      if (err) return res.status(400).send(err);
+      if (err) return res.status(400).send("Internal Server Error");
       res.send("You have subscribed to MartReach newsletter successfully");
     }
   );
@@ -19,7 +19,7 @@ const subscribe = (req, res, next) => {
 // GET
 const getNewsletters = (req, res, next) => {
   connection.query(`select * from newsletter`, (err, resp) => {
-    if (err) throw err;
+    if (err) return res.status(400).send("Internal Server Error");
     res.send(resp);
   });
 };
@@ -43,7 +43,7 @@ const deleteNewsletter = (req, res, next) => {
     (err, resp) => {
       if (resp.affectedRows === 0)
         return res.status(404).send("Record does not exist.");
-      if (err) return res.send(err);
+      if (err) return res.status(400).send("Internal Server Error");
       res.send("Email successfully deleted from newsletter list.");
     }
   );
@@ -61,7 +61,7 @@ const sendNewsletter = (req, res, next) => {
       `${recipients}`,
       `This is a MartReach newsletter.`,
       (err3, info) => {
-        if (err3) return res.status(500).send(err3);
+        if (err3) return res.status(400).send("Internal Server Error");
         res.status(201).send("Newsletter sent successfully!");
       }
     );

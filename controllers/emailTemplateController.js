@@ -5,10 +5,13 @@ const fetch = require("node-fetch");
 
 // get emailTemplates
 const getEmailTemplates = (req, res, next) => {
-  connection.query(`select * from email_templates`, (err, resp) => {
-    if (err) throw err;
-    res.send(resp);
-  });
+  connection.query(
+    `select * from email_templates where user_id=${req.user.data.userId}`,
+    (err, resp) => {
+      if (err) return res.status(400).send("Internal Server Error");
+      res.send(resp);
+    }
+  );
 };
 
 // get emailTemplates by id
@@ -135,12 +138,20 @@ const editEmailTemplate = (req, res, next) => {
 // DELETE emailTemplate
 const deleteEmailTemplate = (req, res, next) => {
   connection.query(
-    `delete from email_templates where id = ${req.params.id}`,
-    (err, resp) => {
-      if (resp.affectedRows === 0)
-        return res.status(404).send("Template does not exist.");
-      if (err) return res.send(err);
-      res.send("Email Template successfully deleted.");
+    `select * from email_templates where user_id=${req.user.data.userId}`,
+    (err, resp1) => {
+      let emailTemplate = resp1.find((x) => x.id == req.params.id);
+      if (emailTemplate == undefined)
+        return res.status(401).send("Cannot delete template you didn't create");
+      connection.query(
+        `delete from email_templates where id = ${req.params.id}`,
+        (err, resp) => {
+          if (resp.affectedRows === 0)
+            return res.status(404).send("Template does not exist.");
+          if (err) return res.status(400).send("Internal Server Error");
+          res.send("Email Template successfully deleted.");
+        }
+      );
     }
   );
 };

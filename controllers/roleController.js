@@ -3,7 +3,7 @@ const connection = require("../models/db");
 // VIEW ROLES
 const getRoles = (req, res, next) => {
   connection.query(`select * from role`, (err, resp) => {
-    if (err) throw err;
+    if (err) return res.status(400).send("Internal Server Error");
     res.send(resp);
   });
 };
@@ -25,7 +25,7 @@ const deleteRole = (req, res, next) => {
   connection.query(
     `delete from role where id = ${req.params.id}`,
     (err, resp) => {
-      if (err) return res.send(err);
+      if (err) return res.status(400).send("Internal Server Error");
       res.send("role successfully deleted");
     }
   );
@@ -41,7 +41,7 @@ const createRole = (req, res, next) => {
               ('${req.body.roleName}',
               '${req.body.roleDescription}')`,
     (error, resp) => {
-      if (error) return res.send(error.sqlMessage);
+      if (error) return res.status(400).send("Internal Server Error");
       res.send("role successfully created.");
       res.end();
     }
@@ -55,7 +55,7 @@ const editRole = (req, res, next) => {
     `SELECT * FROM role WHERE id=${req.params.id}`,
     (err, db_res) => {
       if (err) {
-        res.send(err);
+        return res.status(400).send("Internal Server Error");
       } else if (db_res.length < 1) {
         res.status(404).send(`Error! role does not exist.`);
       } else {
@@ -67,7 +67,7 @@ const editRole = (req, res, next) => {
         connection.query(
           `update role set roleName = '${roleName}', roleDescription = '${roleDescription}' where id=${req.params.id}`,
           (err, response) => {
-            if (err) throw err;
+            if (err) return res.status(400).send("Internal Server Error");
             res.send("role edited Successfully");
           }
         );
@@ -86,12 +86,12 @@ const assignRole = (req, res, next) => {
   connection.query(
     `select * from user_role where userId=${userId}`,
     (err, resp) => {
-      if (err) return res.send(err.sqlMessage);
+      if (err) return res.status(400).send("Internal Server Error");
       if (resp.length > 0) {
         connection.query(
           `delete from user_role where userId = ${userId}`,
           (error, resp1) => {
-            if (error) return res.send(error.sqlMessage);
+            if (error) return res.status(400).send("Internal Server Error");
           }
         );
       }
@@ -101,7 +101,7 @@ const assignRole = (req, res, next) => {
               ('','${roleId}',
               '${userId}')`,
         (error, resp1) => {
-          if (error) return res.send(error.sqlMessage);
+          if (error) return res.status(400).send("Internal Server Error");
           res.send(`User ID ${userId} has been assigned role ID ${roleId}`);
         }
       );
