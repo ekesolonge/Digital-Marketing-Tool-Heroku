@@ -283,7 +283,7 @@ const login = (req, res, next) => {
         } else {
           // Check permissions
           connection.query(
-            `select permissionName,groupName from permission inner join role_permission on permission.permissionId = role_permission.permissionId where role_permission.roleId = ${resp[0].roleId}`,
+            `select permissionName,groupName from permission inner join role_permission on permission.id = role_permission.id where role_permission.roleId = ${resp[0].roleId}`,
             (err, resPerm) => {
               if (err) return res.status(401).send(err);
               resp[0].permissions = resPerm;
