@@ -5,6 +5,7 @@ const { authenticate } = require("../middleware/authorization"); // authorizatio
 // import emailTemplateControllers
 const {
   getEmailTemplates,
+  getEmailTemplateDesigns,
   getEmailTemplateById,
   createEmailTemplate,
   editEmailTemplate,
@@ -14,6 +15,9 @@ const {
 
 // GET EMAIL TEMPLATES
 router.get("/", authenticate, getEmailTemplates);
+
+// GET EMAIL TEMPLATES
+router.get("/designs", authenticate, getEmailTemplateDesigns);
 
 // GET EMAIL TEMPLATES BY ID
 router.get("/:id", authenticate, getEmailTemplateById);

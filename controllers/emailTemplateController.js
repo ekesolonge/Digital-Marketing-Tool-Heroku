@@ -15,6 +15,14 @@ const getEmailTemplates = (req, res, next) => {
   );
 };
 
+// get email template designs
+const getEmailTemplateDesigns = (req, res, next) => {
+  connection.query(`select * from email_template_designs`, (err, resp) => {
+    if (err) return res.status(400).send("Internal Server Error");
+    res.send(resp);
+  });
+};
+
 // get emailTemplates by id
 const getEmailTemplateById = (req, res, next) => {
   connection.query(
@@ -207,6 +215,7 @@ const testEmailTemplate = (req, res, next) => {
 
 // Export functions
 module.exports.getEmailTemplates = getEmailTemplates;
+module.exports.getEmailTemplateDesigns = getEmailTemplateDesigns;
 module.exports.getEmailTemplateById = getEmailTemplateById;
 module.exports.createEmailTemplate = createEmailTemplate;
 module.exports.editEmailTemplate = editEmailTemplate;
