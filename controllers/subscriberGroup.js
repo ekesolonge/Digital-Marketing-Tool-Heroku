@@ -1,4 +1,5 @@
 const connection = require("../models/db");
+const logTrail = require("../middleware/auditTrail");
 
 // Get subscriber_group API
 const getSubscriberGroup = (req, res) => {
@@ -37,6 +38,14 @@ const deleteSubscriberGroup = (req, res) => {
         (err, resp) => {
           if (err) return res.status(400).send("Internal Server Error");
           res.send("subscriber group successfully deleted");
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `deleted a subscriber group`,
+            type: "warning",
+          };
+          logTrail(trail);
         }
       );
     }
@@ -57,6 +66,14 @@ const createSubscriberGroup = (req, res) => {
       if (error) return res.status(400).send("Internal Server Error");
       res.send("subscriber group successfully created.");
       res.end();
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `created a subscriber group`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };
@@ -76,6 +93,14 @@ const editSubscriberGroup = (req, res) => {
         (err, response) => {
           if (err) return res.status(400).send("Internal Server Error");
           res.send("subscriber group edited Successfully");
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `edited a subscriber group`,
+            type: "success",
+          };
+          logTrail(trail);
         }
       );
     }

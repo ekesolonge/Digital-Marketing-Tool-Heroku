@@ -1,4 +1,5 @@
 const connection = require("../models/db"); // database module
+const logTrail = require("../middleware/auditTrail");
 
 // Get sticky notes
 const getStickyNote = (req, res) => {
@@ -43,6 +44,14 @@ const saveStickyNote = (req, res) => {
           (err, resp) => {
             if (err) return res.status(400).send("Internal Server Error");
             res.send("Sticky Note Created Successfully.");
+
+            // Audit Trail
+            let trail = {
+              actor: req.user.data.userId,
+              action: `saved sticky note`,
+              type: "success",
+            };
+            logTrail(trail);
           }
         );
       } // if sticky note doesn't exists
@@ -53,6 +62,14 @@ const saveStickyNote = (req, res) => {
           (err, response) => {
             if (err) return res.status(400).send("Internal Server Error");
             res.send("Sticky Note Updated Successfully");
+
+            // Audit Trail
+            let trail = {
+              actor: req.user.data.userId,
+              action: `updated sticky note`,
+              type: "success",
+            };
+            logTrail(trail);
           }
         );
       }

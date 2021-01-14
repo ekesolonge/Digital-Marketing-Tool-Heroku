@@ -2,6 +2,7 @@ const connection = require("../models/db"); // database module
 const Joi = require("joi"); // validator
 const sendMail = require("../middleware/mailer");
 const fetch = require("node-fetch");
+const logTrail = require("../middleware/auditTrail");
 
 // get emailTemplates
 const getEmailTemplates = (req, res, next) => {
@@ -66,6 +67,14 @@ const createEmailTemplate = (req, res, next) => {
         (err, resp) => {
           if (err) return res.status(400).send("Internal Server Error");
           res.send("Email Template created successfully.");
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `created new email template`,
+            type: "success",
+          };
+          logTrail(trail);
         }
       );
     })
@@ -125,6 +134,14 @@ const editEmailTemplate = (req, res, next) => {
             (err, db_res) => {
               if (err) return res.status(400).send("Internal Server Error");
               res.send(`Email Template Updated Successfully`);
+
+              // Audit Trail
+              let trail = {
+                actor: req.user.data.userId,
+                action: `updated an email template`,
+                type: "success",
+              };
+              logTrail(trail);
             }
           );
         })
@@ -150,6 +167,14 @@ const deleteEmailTemplate = (req, res, next) => {
             return res.status(404).send("Template does not exist.");
           if (err) return res.status(400).send("Internal Server Error");
           res.send("Email Template successfully deleted.");
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `deleted an email template`,
+            type: "warning",
+          };
+          logTrail(trail);
         }
       );
     }
@@ -168,6 +193,14 @@ const testEmailTemplate = (req, res, next) => {
     (err3, info) => {
       if (err3) return res.status(500).send("Internal Server Error");
       res.status(201).send("Email Template Test Mail Sent successfully");
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `sent a test mail with an email template`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };

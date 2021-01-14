@@ -1,4 +1,5 @@
 const connection = require("../models/db");
+const logTrail = require("../middleware/auditTrail");
 
 // VIEW ROLES
 const getRoles = (req, res, next) => {
@@ -27,6 +28,14 @@ const deleteRole = (req, res, next) => {
     (err, resp) => {
       if (err) return res.status(400).send("Internal Server Error");
       res.send("role successfully deleted");
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `deleted a role`,
+        type: "warning",
+      };
+      logTrail(trail);
     }
   );
 };
@@ -44,6 +53,14 @@ const createRole = (req, res, next) => {
       if (error) return res.status(400).send("Internal Server Error");
       res.send("role successfully created.");
       res.end();
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `created a new role`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };
@@ -69,6 +86,14 @@ const editRole = (req, res, next) => {
           (err, response) => {
             if (err) return res.status(400).send("Internal Server Error");
             res.send("role edited Successfully");
+
+            // Audit Trail
+            let trail = {
+              actor: req.user.data.userId,
+              action: `edited a role`,
+              type: "success",
+            };
+            logTrail(trail);
           }
         );
       }
@@ -103,6 +128,14 @@ const assignRole = (req, res, next) => {
         (error, resp1) => {
           if (error) return res.status(400).send("Internal Server Error");
           res.send(`User ID ${userId} has been assigned role ID ${roleId}`);
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `assigned a role with id ${roleId} to a user with id ${userId}`,
+            type: "success",
+          };
+          logTrail(trail);
         }
       );
     }

@@ -1,5 +1,6 @@
 const connection = require("../models/db");
 const sendMail = require("../middleware/mailer");
+const logTrail = require("../middleware/auditTrail");
 
 // Get campaign API
 const getCampaign = (req, res) => {
@@ -38,6 +39,14 @@ const deleteCampaign = (req, res) => {
         (err, resp) => {
           if (err) return res.status(400).send("Internal Server Error");
           res.send("campaign successfully deleted");
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `deleted campaign`,
+            type: "warning",
+          };
+          logTrail(trail);
         }
       );
     }
@@ -80,6 +89,14 @@ const createCampaign = (req, res) => {
           if (error) return res.status(400).send("Internal Server Error");
           res.send("campaign successfully created.");
           res.end();
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `created new campaign`,
+            type: "success",
+          };
+          logTrail(trail);
         }
       );
     }
@@ -120,6 +137,14 @@ const editCampaign = (req, res) => {
             (err, response) => {
               if (err) return res.status(400).send("Internal server error");
               res.send("campaign edited Successfully");
+
+              // Audit Trail
+              let trail = {
+                actor: req.user.data.userId,
+                action: `edited campaign`,
+                type: "success",
+              };
+              logTrail(trail);
             }
           );
         }
@@ -152,6 +177,14 @@ const sendCampaign = (req, res, next) => {
         (err3, info) => {
           if (err3) return res.status(400).send("Internal Server Error");
           res.status(201).send("Campaign sent successfully!");
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `sent a campaign`,
+            type: "success",
+          };
+          logTrail(trail);
         }
       );
     }

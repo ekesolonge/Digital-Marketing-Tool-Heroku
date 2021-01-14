@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require("uuid"); //uuid module for generating universally
 const fetch = require("node-fetch");
 const url = require("url");
 const moment = require("moment");
+const logTrail = require("../middleware/auditTrail");
 
 // Get all payments
 const getPayment = (req, res) => {
@@ -41,6 +42,14 @@ const createPlan = (req, res) => {
             res.status(400).send("Internal Server Error");
           }
           res.status(200).send("Payment Plan created Successfully");
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `created a new payment plan`,
+            type: "success",
+          };
+          logTrail(trail);
         }
       );
     })
@@ -93,6 +102,14 @@ const makePayment = (req, res) => {
             (err, resp) => {
               if (err) return res.status(400).send("Internal Server Error");
               res.status(200).send(json);
+
+              // Audit Trail
+              let trail = {
+                actor: req.user.data.userId,
+                action: `Initiated a payment`,
+                type: "success",
+              };
+              logTrail(trail);
             }
           );
         })
@@ -165,6 +182,14 @@ const verifyPayment = (req, res) => {
                                 res.send(
                                   "Payment Successful And Subscription activated"
                                 );
+
+                                // Audit Trail
+                                let trail = {
+                                  actor: req.user.data.userId,
+                                  action: `subscribed to a package with id ${packageID}`,
+                                  type: "success",
+                                };
+                                logTrail(trail);
                               }
                             );
                           });
@@ -199,6 +224,14 @@ const verifyPayment = (req, res) => {
                                   res.send(
                                     "Payment Successful And Subscription Extended"
                                   );
+
+                                  // Audit Trail
+                                  let trail = {
+                                    actor: req.user.data.userId,
+                                    action: `extended their subscription to package with id ${packageID}`,
+                                    type: "success",
+                                  };
+                                  logTrail(trail);
                                 }
                               );
                             });
@@ -229,6 +262,14 @@ const verifyPayment = (req, res) => {
                                   res.send(
                                     "Payment Successful And Subscription Re-activated"
                                   );
+
+                                  // Audit Trail
+                                  let trail = {
+                                    actor: req.user.data.userId,
+                                    action: `Resubscribed to package with id ${packageID}`,
+                                    type: "success",
+                                  };
+                                  logTrail(trail);
                                 }
                               );
                             });
@@ -244,6 +285,14 @@ const verifyPayment = (req, res) => {
             res.status(400).send("Payment already confirmed");
           } else {
             res.send("Error confirming payment");
+
+            // Audit Trail
+            let trail = {
+              actor: req.user.data.userId,
+              action: `failed to verify user payment`,
+              type: "danger",
+            };
+            logTrail(trail);
           }
         }
       );

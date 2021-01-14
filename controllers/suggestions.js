@@ -1,4 +1,5 @@
 const connection = require("../models/db"); // database module
+const logTrail = require("../middleware/auditTrail");
 
 // Get Suggestion
 const getSuggestions = (req, res) => {
@@ -19,6 +20,14 @@ const createSuggestions = (req, res) => {
     (err, resp) => {
       if (err) return res.status(400).send("Internal Server Error");
       res.send("Suggestion Sent successfully.");
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `sent suggestion to admin`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };

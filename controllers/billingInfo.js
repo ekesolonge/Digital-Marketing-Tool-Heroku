@@ -1,4 +1,5 @@
 const connection = require("../models/db"); // database module
+const logTrail = require("../middleware/auditTrail");
 
 // Create Billing Info
 const createBillingInfo = (req, res) => {
@@ -19,6 +20,14 @@ const createBillingInfo = (req, res) => {
     (err, res) => {
       if (err) return res.status(400).send("Internal Server Error");
       res.send("Billing Info Saved Successfully.");
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `saved billing info`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };
@@ -30,6 +39,14 @@ const editBillingInfo = (req, res) => {
     (err, response) => {
       if (err) return res.status(400).send("Internal Server Error");
       response.send("Billing Info Updated Successfully");
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `edited billing info`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };

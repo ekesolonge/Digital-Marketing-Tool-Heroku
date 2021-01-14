@@ -1,6 +1,7 @@
 const connection = require("../models/db");
 const fs = require("fs");
 const csv = require("csv-parser");
+const logTrail = require("../middleware/auditTrail");
 
 // Get audience API
 const getAudience = (req, res) => {
@@ -37,6 +38,13 @@ const deleteAudience = (req, res) => {
         (err, resp) => {
           if (err) return res.status(400).send("Internal Server Error");
           res.send("audience successfully deleted");
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `deleted audience`,
+            type: "warning",
+          };
+          logTrail(trail);
         }
       );
     }
@@ -75,6 +83,14 @@ const createAudience = (req, res) => {
       if (error) return res.status(400).send("Internal Server Error");
       res.send("audience successfully created.");
       res.end();
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `created new audience`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };
@@ -93,6 +109,14 @@ const editAudience = (req, res) => {
         (err, response) => {
           if (err) return res.status(400).send("Internal Server Error");
           res.send("audience edited Successfully");
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `edited audience`,
+            type: "success",
+          };
+          logTrail(trail);
         }
       );
     }
@@ -131,6 +155,14 @@ const importContacts = (req, res) => {
         (dbErr, resp) => {
           if (dbErr) return res.status(400).send("Internal Server Error");
           res.send("Contacts Imported Successfully");
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.userId,
+            action: `imported contacts`,
+            type: "success",
+          };
+          logTrail(trail);
         }
       );
     });

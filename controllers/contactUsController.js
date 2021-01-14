@@ -1,6 +1,7 @@
 const connection = require("../models/db"); // database module
 const Joi = require("joi"); // validator
 const sendMail = require("../middleware/mailer");
+const logTrail = require("../middleware/auditTrail");
 
 //POST
 const sendContact = (req, res, next) => {
@@ -15,6 +16,14 @@ const sendContact = (req, res, next) => {
       res.send(
         "Thank you for contacting us, we will get back to you as soon as possible."
       );
+
+      // Audit Trail
+      let trail = {
+        actor: req.body.email,
+        action: `sent a contact us message`,
+        type: "success",
+      };
+      logTrail(trail);
 
       sendMail(
         `MartReach <martreach2@gmail.com>`,
@@ -63,6 +72,14 @@ const deleteContact = (req, res, next) => {
         return res.status(404).send("Record does not exist.");
       if (err) return res.status(400).send("Internal Server Error");
       res.send("Record successfully deleted.");
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `deleted a contact us message`,
+        type: "warning",
+      };
+      logTrail(trail);
     }
   );
 };

@@ -1,6 +1,7 @@
 const connection = require("../models/db"); // database module
 const Joi = require("joi"); // validator
 const sendMail = require("../middleware/mailer");
+const logTrail = require("../middleware/auditTrail");
 
 // subscribe to newsletter
 const subscribe = (req, res, next) => {
@@ -12,6 +13,14 @@ const subscribe = (req, res, next) => {
     (err, resp) => {
       if (err) return res.status(400).send("Internal Server Error");
       res.send("You have subscribed to MartReach newsletter successfully");
+
+      // Audit Trail
+      let trail = {
+        actor: req.body.email,
+        action: `subscribed to newsletter`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };
@@ -45,6 +54,14 @@ const deleteNewsletter = (req, res, next) => {
         return res.status(404).send("Record does not exist.");
       if (err) return res.status(400).send("Internal Server Error");
       res.send("Email successfully deleted from newsletter list.");
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `deleted a newsletter subscriber`,
+        type: "warning",
+      };
+      logTrail(trail);
     }
   );
 };
@@ -63,6 +80,14 @@ const sendNewsletter = (req, res, next) => {
       (err3, info) => {
         if (err3) return res.status(400).send("Internal Server Error");
         res.status(201).send("Newsletter sent successfully!");
+
+        // Audit Trail
+        let trail = {
+          actor: req.user.data.userId,
+          action: `sent out newsletters`,
+          type: "success",
+        };
+        logTrail(trail);
       }
     );
   });

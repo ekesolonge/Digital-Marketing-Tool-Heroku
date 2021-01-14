@@ -345,6 +345,14 @@ const signup = (req, res, next) => {
                       "Signup Successful! Please, check your mail and activate your account!"
                     );
                   defaultRole(resp2.insertId);
+
+                  // Audit Trail
+                  let trail = {
+                    actor: username,
+                    action: `new user signup`,
+                    type: "success",
+                  };
+                  logTrail(trail);
                 }
               );
             }
@@ -453,6 +461,13 @@ const resetPassword = (req, res, next) => {
                   .send(
                     "Password reset requested! Please, check your mail and reset your password!"
                   );
+                // Audit Trail
+                let trail = {
+                  actor: resp[0].username,
+                  action: `Password reset requested`,
+                  type: "warning",
+                };
+                logTrail(trail);
               }
             );
           }
@@ -508,10 +523,16 @@ const setPassword = (req, res) => {
             connection.query(
               `UPDATE users SET otp = null, password = '${hash}' WHERE id = ${userId}`,
               (err2, resp2) => {
-                if (err2) {
+                if (err2)
                   return res.status(422).json({ message: "Internal error" });
-                }
-                return res.status(200).send("Password reset successful");
+                res.status(200).send("Password reset successful");
+                // Audit Trail
+                let trail = {
+                  actor: resp[0].username,
+                  action: `Password reset successful`,
+                  type: "success",
+                };
+                logTrail(trail);
               }
             );
           });
@@ -558,11 +579,18 @@ const activateAccount = (req, res) => {
               if (err2) {
                 return res.status(422).json({ message: "Internal error" });
               }
-              return res
+              res
                 .status(200)
                 .redirect(
                   "https://md-ameenu.github.io/DIGITAL-MARKETING-TOOL-REACT-MIGRATION-/#/"
                 );
+              // Audit Trail
+              let trail = {
+                actor: resp[0].username,
+                action: `User account activated`,
+                type: "success",
+              };
+              logTrail(trail);
             }
           );
         } else {

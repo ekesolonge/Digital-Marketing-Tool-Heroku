@@ -1,4 +1,5 @@
 const connection = require("../models/db");
+const logTrail = require("../middleware/auditTrail");
 
 // Get permission API
 const getPermissions = (req, res, next) => {
@@ -26,6 +27,14 @@ const deletePermission = (req, res, next) => {
     (err, resp) => {
       if (err) return res.status(400).send("Internal Server Error");
       res.send("permission successfully deleted");
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `deleted a permission`,
+        type: "warning",
+      };
+      logTrail(trail);
     }
   );
 };
@@ -48,6 +57,14 @@ const createPermission = (req, res, next) => {
       if (error) return res.status(400).send("Internal Server Error");
       res.send("permission successfully created.");
       res.end();
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `created a new permission`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };
@@ -59,6 +76,14 @@ const editPermission = (req, res, next) => {
     (err, response) => {
       if (err) return res.status(400).send("Internal Server Error");
       res.send("permission edited Successfully");
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `edited a permission`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };
@@ -78,6 +103,14 @@ const assignPermission = (req, res, next) => {
       res.send(
         `Permission ID ${permissionId} has been assigned to role ID ${roleId}`
       );
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.userId,
+        action: `assigned a permission with id ${permissionId} to a role with id ${roleId}`,
+        type: "success",
+      };
+      logTrail(trail);
     }
   );
 };
