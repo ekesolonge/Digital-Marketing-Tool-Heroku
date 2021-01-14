@@ -40,11 +40,19 @@ const deleteUser = (req, res, next) => {
         return res.status(400).send("Record doesn't exist");
       if (err) return res.status(400).send("Internal Server Error");
       res.send("User successfully deleted.");
+
+      // Audit Trail
+      let trail = {
+        actor: req.user.data.username,
+        action: `deleted a user`,
+        type: "warning",
+      };
+      logTrail(trail);
     }
   );
 };
 
-// CREATE A NEW USER
+// CREATE A NEW USER (ADMIN)
 const createUser = (req, res, next) => {
   // Joi validation
   const { error } = validateSignup(req.body);
@@ -98,6 +106,14 @@ const createUser = (req, res, next) => {
               res.send("User successfully created.");
               defaultRole(resp2.insertId); // assigns user role to new users
               res.end();
+
+              // Audit Trail
+              let trail = {
+                actor: req.user.data.username,
+                action: `created a new user`,
+                type: "success",
+              };
+              logTrail(trail);
             }
           );
         });
@@ -106,7 +122,7 @@ const createUser = (req, res, next) => {
   );
 };
 
-// EDIT USER
+// EDIT USER (ADMIN)
 const editUser = (req, res, next) => {
   let {
     firstName,
@@ -123,7 +139,7 @@ const editUser = (req, res, next) => {
     `SELECT * FROM users WHERE id=${req.params.id}`,
     (err, db_res) => {
       if (err) {
-        res.send(err);
+        res.status(400).send("Internal Server Error");
       } else if (db_res.length < 1) {
         res.status(404).send(`Error! User does not exist.`);
       } else {
@@ -162,6 +178,85 @@ const editUser = (req, res, next) => {
           connection.query(sql, (err, db_res) => {
             if (err) return res.status(400).send("Internal Server Error");
             res.send(`User Updated Successfully.`);
+
+            // Audit Trail
+            let trail = {
+              actor: req.user.data.username,
+              action: `Edited a user`,
+              type: "success",
+            };
+            logTrail(trail);
+          });
+        });
+      }
+    }
+  );
+};
+
+// Update Profile
+const updateProfile = (req, res, next) => {
+  let {
+    firstName,
+    lastName,
+    username,
+    tel,
+    email,
+    password,
+    website,
+    picture,
+  } = req.body;
+
+  connection.query(
+    `SELECT * FROM users WHERE id=${req.user.data.userId}`,
+    (err, db_res) => {
+      if (err) {
+        res.status(400).send("Internal Server Error");
+      } else if (db_res.length < 1) {
+        res.status(404).send(`Error! User does not exist.`);
+      } else {
+        let users = db_res;
+        if (firstName == undefined) firstName = users[0].firstName;
+
+        if (lastName == undefined) lastName = users[0].lastName;
+
+        if (username == undefined) username = users[0].username;
+
+        if (tel == undefined) tel = users[0].tel;
+
+        if (email == undefined) email = users[0].email;
+
+        if (password == undefined) password = users[0].password;
+
+        if (website == undefined) website = users[0].website;
+
+        if (picture == undefined) picture = users[0].picture;
+
+        // Hash password
+        bcrypt.hash(password, 10, (err, hash) => {
+          if (err) return res.status(400).send("Internal Server Error");
+
+          // Store Path of image uploaded
+          var filePath;
+          if (req.file) {
+            filePath = req.file.path.split("\\").join("/");
+          } else {
+            filePath = users[0].picture;
+          }
+
+          let sql = `update users set firstName = '${firstName}', lastName = '${lastName}',username = '${username}',tel = '${tel}',email = '${email.toLowerCase()}',password = '${hash}',website = '${website}',picture = '${filePath}' where id = ${
+            req.user.data.userId
+          }`;
+          connection.query(sql, (err, db_res) => {
+            if (err) return res.status(400).send("Internal Server Error");
+            res.send(`Profile Updated Successfully.`);
+
+            // Audit Trail
+            let trail = {
+              actor: req.user.data.username,
+              action: `updated profile`,
+              type: "success",
+            };
+            logTrail(trail);
           });
         });
       }
@@ -301,6 +396,7 @@ const login = (req, res, next) => {
               };
               res.send(tokenData);
 
+              // Audit Trail
               let trail = {
                 actor: req.body.username,
                 action: `successful login`,
@@ -519,6 +615,7 @@ module.exports.getUserById = getUserById;
 module.exports.deleteUser = deleteUser;
 module.exports.createUser = createUser;
 module.exports.editUser = editUser;
+module.exports.updateProfile = updateProfile;
 module.exports.signup = signup;
 module.exports.login = login;
 module.exports.activateAccount = activateAccount;

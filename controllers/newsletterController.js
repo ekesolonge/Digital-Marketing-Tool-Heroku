@@ -52,7 +52,7 @@ const deleteNewsletter = (req, res, next) => {
 // Send newsletters
 const sendNewsletter = (req, res, next) => {
   connection.query(`select * from newsletter`, (err, resp) => {
-    if (err) throw err;
+    if (err) return res.status(400).send("Internal Server Error");
     let recipients = resp.map((x) => x.email);
 
     sendMail(

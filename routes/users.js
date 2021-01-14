@@ -10,6 +10,7 @@ const {
   deleteUser,
   createUser,
   editUser,
+  updateProfile,
   signup,
   login,
   activateAccount,
@@ -27,11 +28,14 @@ router.get("/:id", authenticate, manageUser, getUserById);
 // DELETE USERS
 router.delete("/:id", authenticate, manageUser, deleteUser);
 
-// CREATE A NEW USER
+// CREATE A NEW USER (ADMIN)
 router.post("/", authenticate, manageUser, createUser);
 
-// EDIT USER
+// EDIT USER (ADMIN)
 router.put("/:id", authenticate, upload.single("image"), editUser);
+
+// UPDATE PROFILE
+router.put("/", authenticate, upload.single("image"), updateProfile);
 
 // SIGNUP
 router.post("/signup", signup);
