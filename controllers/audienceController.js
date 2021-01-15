@@ -54,17 +54,17 @@ const deleteAudience = (req, res) => {
 // REST API to Insert audience
 const createAudience = (req, res) => {
   if (
-    !req.body.user_id ||
     !req.body.firstName ||
     !req.body.lastName ||
     !req.body.email ||
-    !req.body.tel ||
-    !req.body.country ||
-    !req.body.state ||
-    !req.body.city ||
-    !req.body.birthday
+    !req.body.tel
   )
     return res.status(400).send("Please fill all required fields");
+
+  if (!req.body.country) req.body.country = "";
+  if (!req.body.state) req.body.state = "";
+  if (!req.body.city) req.body.city = "";
+  if (!req.body.birthday) req.body.birthday = "";
 
   // INSERT into database
   connection.query(
@@ -97,6 +97,20 @@ const createAudience = (req, res) => {
 
 //rest api to update record into mysql database
 const editAudience = (req, res) => {
+  if (
+    !req.body.firstName ||
+    !req.body.lastName ||
+    !req.body.email ||
+    !req.body.subscriberGroup ||
+    !req.body.tel
+  )
+    return res.status(400).send("Please fill all required fields");
+
+  if (!req.body.country) req.body.country = "";
+  if (!req.body.state) req.body.state = "";
+  if (!req.body.city) req.body.city = "";
+  if (!req.body.birthday) req.body.birthday = "";
+
   connection.query(
     `select * from audience where user_id=${req.user.data.userId}`,
     (err, resp) => {
