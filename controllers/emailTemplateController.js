@@ -78,7 +78,7 @@ const createEmailTemplate = (req, res, next) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `created new email template`,
             type: "success",
           };
@@ -145,7 +145,7 @@ const editEmailTemplate = (req, res, next) => {
 
               // Audit Trail
               let trail = {
-                actor: req.user.data.userId,
+                actor: req.user.data.username,
                 action: `updated an email template`,
                 type: "success",
               };
@@ -178,7 +178,7 @@ const deleteEmailTemplate = (req, res, next) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `deleted an email template`,
             type: "warning",
           };
@@ -204,7 +204,7 @@ const testEmailTemplate = (req, res, next) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `sent a test mail with an email template`,
         type: "success",
       };

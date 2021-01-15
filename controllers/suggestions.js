@@ -23,7 +23,7 @@ const createSuggestions = (req, res) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `sent suggestion to admin`,
         type: "success",
       };

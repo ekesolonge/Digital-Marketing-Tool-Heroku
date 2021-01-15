@@ -30,7 +30,7 @@ const deletePermission = (req, res, next) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `deleted a permission`,
         type: "warning",
       };
@@ -60,7 +60,7 @@ const createPermission = (req, res, next) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `created a new permission`,
         type: "success",
       };
@@ -79,7 +79,7 @@ const editPermission = (req, res, next) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `edited a permission`,
         type: "success",
       };
@@ -106,7 +106,7 @@ const assignPermission = (req, res, next) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `assigned a permission with id ${permissionId} to a role with id ${roleId}`,
         type: "success",
       };

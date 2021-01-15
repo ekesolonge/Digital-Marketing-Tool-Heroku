@@ -23,7 +23,7 @@ const createBillingInfo = (req, res) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `saved billing info`,
         type: "success",
       };
@@ -42,7 +42,7 @@ const editBillingInfo = (req, res) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `edited billing info`,
         type: "success",
       };

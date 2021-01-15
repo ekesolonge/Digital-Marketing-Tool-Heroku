@@ -23,7 +23,7 @@ const createReply = (req, res) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `sent a reply to a user`,
         type: "success",
       };

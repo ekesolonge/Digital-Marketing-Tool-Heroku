@@ -41,7 +41,7 @@ const deleteSubscriberGroup = (req, res) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `deleted a subscriber group`,
             type: "warning",
           };
@@ -69,7 +69,7 @@ const createSubscriberGroup = (req, res) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `created a subscriber group`,
         type: "success",
       };
@@ -96,7 +96,7 @@ const editSubscriberGroup = (req, res) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `edited a subscriber group`,
             type: "success",
           };

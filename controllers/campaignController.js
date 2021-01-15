@@ -42,7 +42,7 @@ const deleteCampaign = (req, res) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `deleted campaign`,
             type: "warning",
           };
@@ -92,7 +92,7 @@ const createCampaign = (req, res) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `created new campaign`,
             type: "success",
           };
@@ -140,7 +140,7 @@ const editCampaign = (req, res) => {
 
               // Audit Trail
               let trail = {
-                actor: req.user.data.userId,
+                actor: req.user.data.username,
                 action: `edited campaign`,
                 type: "success",
               };
@@ -180,7 +180,7 @@ const sendCampaign = (req, res, next) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `sent a campaign`,
             type: "success",
           };

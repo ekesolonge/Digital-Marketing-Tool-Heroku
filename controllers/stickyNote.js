@@ -47,7 +47,7 @@ const saveStickyNote = (req, res) => {
 
             // Audit Trail
             let trail = {
-              actor: req.user.data.userId,
+              actor: req.user.data.username,
               action: `saved sticky note`,
               type: "success",
             };
@@ -65,7 +65,7 @@ const saveStickyNote = (req, res) => {
 
             // Audit Trail
             let trail = {
-              actor: req.user.data.userId,
+              actor: req.user.data.username,
               action: `updated sticky note`,
               type: "success",
             };

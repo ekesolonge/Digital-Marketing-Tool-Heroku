@@ -31,7 +31,7 @@ const deleteRole = (req, res, next) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `deleted a role`,
         type: "warning",
       };
@@ -56,7 +56,7 @@ const createRole = (req, res, next) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `created a new role`,
         type: "success",
       };
@@ -89,7 +89,7 @@ const editRole = (req, res, next) => {
 
             // Audit Trail
             let trail = {
-              actor: req.user.data.userId,
+              actor: req.user.data.username,
               action: `edited a role`,
               type: "success",
             };
@@ -131,7 +131,7 @@ const assignRole = (req, res, next) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `assigned a role with id ${roleId} to a user with id ${userId}`,
             type: "success",
           };

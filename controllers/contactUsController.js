@@ -75,7 +75,7 @@ const deleteContact = (req, res, next) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `deleted a contact us message`,
         type: "warning",
       };

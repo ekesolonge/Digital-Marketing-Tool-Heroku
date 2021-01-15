@@ -45,7 +45,7 @@ const createPlan = (req, res) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `created a new payment plan`,
             type: "success",
           };
@@ -105,7 +105,7 @@ const makePayment = (req, res) => {
 
               // Audit Trail
               let trail = {
-                actor: req.user.data.userId,
+                actor: req.user.data.username,
                 action: `Initiated a payment`,
                 type: "success",
               };
@@ -185,7 +185,7 @@ const verifyPayment = (req, res) => {
 
                                 // Audit Trail
                                 let trail = {
-                                  actor: req.user.data.userId,
+                                  actor: req.user.data.username,
                                   action: `subscribed to a package with id ${packageID}`,
                                   type: "success",
                                 };
@@ -227,7 +227,7 @@ const verifyPayment = (req, res) => {
 
                                   // Audit Trail
                                   let trail = {
-                                    actor: req.user.data.userId,
+                                    actor: req.user.data.username,
                                     action: `extended their subscription to package with id ${packageID}`,
                                     type: "success",
                                   };
@@ -265,7 +265,7 @@ const verifyPayment = (req, res) => {
 
                                   // Audit Trail
                                   let trail = {
-                                    actor: req.user.data.userId,
+                                    actor: req.user.data.username,
                                     action: `Resubscribed to package with id ${packageID}`,
                                     type: "success",
                                   };
@@ -288,7 +288,7 @@ const verifyPayment = (req, res) => {
 
             // Audit Trail
             let trail = {
-              actor: req.user.data.userId,
+              actor: req.user.data.username,
               action: `failed to verify user payment`,
               type: "danger",
             };

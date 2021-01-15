@@ -40,7 +40,7 @@ const deleteAudience = (req, res) => {
           res.send("audience successfully deleted");
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `deleted audience`,
             type: "warning",
           };
@@ -65,12 +65,13 @@ const createAudience = (req, res) => {
   if (!req.body.state) req.body.state = "";
   if (!req.body.city) req.body.city = "";
   if (!req.body.birthday) req.body.birthday = "";
+  if (!req.body.subscriberGroup) req.body.subscriberGroup = null;
 
   // INSERT into database
   connection.query(
     `insert into audience (user_id,subscriberGroup,firstName,lastName,tel,email,country,state,city,birthday) values 
               ('${req.user.data.userId}',
-              '${null}',
+              '${req.body.subscriberGroup}',
               '${req.body.firstName}',
               '${req.body.lastName}',
               '${req.body.tel}',
@@ -86,7 +87,7 @@ const createAudience = (req, res) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `created new audience`,
         type: "success",
       };
@@ -97,6 +98,20 @@ const createAudience = (req, res) => {
 
 //rest api to update record into mysql database
 const editAudience = (req, res) => {
+  if (
+    !req.body.firstName ||
+    !req.body.lastName ||
+    !req.body.email ||
+    !req.body.tel
+  )
+    return res.status(400).send("Please fill all required fields");
+
+  if (!req.body.country) req.body.country = "";
+  if (!req.body.state) req.body.state = "";
+  if (!req.body.city) req.body.city = "";
+  if (!req.body.birthday) req.body.birthday = "";
+  if (!req.body.subscriberGroup) req.body.subscriberGroup = null;
+
   connection.query(
     `select * from audience where user_id=${req.user.data.userId}`,
     (err, resp) => {
@@ -112,7 +127,7 @@ const editAudience = (req, res) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `edited audience`,
             type: "success",
           };
@@ -158,7 +173,7 @@ const importContacts = (req, res) => {
 
           // Audit Trail
           let trail = {
-            actor: req.user.data.userId,
+            actor: req.user.data.username,
             action: `imported contacts`,
             type: "success",
           };

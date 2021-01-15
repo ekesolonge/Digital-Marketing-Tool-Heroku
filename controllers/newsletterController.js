@@ -57,7 +57,7 @@ const deleteNewsletter = (req, res, next) => {
 
       // Audit Trail
       let trail = {
-        actor: req.user.data.userId,
+        actor: req.user.data.username,
         action: `deleted a newsletter subscriber`,
         type: "warning",
       };
@@ -83,7 +83,7 @@ const sendNewsletter = (req, res, next) => {
 
         // Audit Trail
         let trail = {
-          actor: req.user.data.userId,
+          actor: req.user.data.username,
           action: `sent out newsletters`,
           type: "success",
         };
