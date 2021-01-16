@@ -1,6 +1,7 @@
 const express = require("express"); // express module
 const bodyParser = require("body-parser"); // body-parser middleware
 const cors = require("cors"); // cors
+const path = require("path"); // path
 
 const home = require("./routes/home");
 const users = require("./routes/users");
@@ -20,6 +21,7 @@ const stickyNote = require("./routes/stickyNote");
 
 const app = express();
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, "uploads")));
 
 // CORS
 const corsOptions = {
