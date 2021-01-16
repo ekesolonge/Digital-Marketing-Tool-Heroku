@@ -158,10 +158,11 @@ const sendCampaign = (req, res, next) => {
   connection.query(
     `select campaign.name as campaignName,audience.email,subscriber_group.name,email_templates.html from campaign 
     inner join subscriber_group on campaign.subscriberGroup = subscriber_group.id 
-    inner join audience on audience.subscriberGroup = subscriber_group.id 
+    inner join audience_group on audience_group.subscriberGroupId = subscriber_group.id 
+    inner join audience on audience_group.audienceId = audience.id 
     inner join email_templates on email_templates.id = campaign.emailTemplate where campaign.id=${req.params.id}`,
     (err, resp) => {
-      if (resp.length < 1 || err)
+      if (!resp || resp.length < 1 || err)
         return res.status(400).send("Internal server error");
 
       if (!req.body.subject) req.body.subject = resp[0].campaignName;

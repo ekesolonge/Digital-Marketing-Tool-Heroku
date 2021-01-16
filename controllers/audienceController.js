@@ -65,13 +65,11 @@ const createAudience = (req, res) => {
   if (!req.body.state) req.body.state = "";
   if (!req.body.city) req.body.city = "";
   if (!req.body.birthday) req.body.birthday = "";
-  if (!req.body.subscriberGroup) req.body.subscriberGroup = null;
 
   // INSERT into database
   connection.query(
-    `insert into audience (user_id,subscriberGroup,firstName,lastName,tel,email,country,state,city,birthday) values 
+    `insert into audience (user_id,firstName,lastName,tel,email,country,state,city,birthday) values 
               ('${req.user.data.userId}',
-              '${req.body.subscriberGroup}',
               '${req.body.firstName}',
               '${req.body.lastName}',
               '${req.body.tel}',
@@ -110,7 +108,6 @@ const editAudience = (req, res) => {
   if (!req.body.state) req.body.state = "";
   if (!req.body.city) req.body.city = "";
   if (!req.body.birthday) req.body.birthday = "";
-  if (!req.body.subscriberGroup) req.body.subscriberGroup = null;
 
   connection.query(
     `select * from audience where user_id=${req.user.data.userId}`,
@@ -119,7 +116,7 @@ const editAudience = (req, res) => {
       if (audience == undefined)
         return res.status(401).send("Cannot edit audience you didn't create");
       connection.query(
-        `update audience set subscriberGroup ='${req.body.subscriberGroup}' ,firstName = '${req.body.firstName}', lastName = '${req.body.lastName}', tel='${req.body.tel}', email='${req.body.email}',
+        `update audience set firstName = '${req.body.firstName}', lastName = '${req.body.lastName}', tel='${req.body.tel}', email='${req.body.email}',
          country='${req.body.country}', state='${req.body.state}', city='${req.body.city}', birthday='${req.body.birthday}' where id=${req.params.id}`,
         (err, response) => {
           if (err) return res.status(400).send("Internal Server Error");
@@ -156,17 +153,13 @@ const importContacts = (req, res) => {
         if (contact.birthday == undefined) contact.birthday = null;
         if (contact.country == undefined) contact.country = contact.county;
 
-        values += `(${req.user.data.userId}, '${null}', '${
-          contact.first_name
-        }', '${contact.last_name}', '${contact.phone}', '${contact.email}', '${
-          contact.country
-        }', '${contact.state}', '${contact.city}', '${contact.birthday}'),\n`;
+        values += `(${req.user.data.userId}, '${contact.first_name}', '${contact.last_name}', '${contact.phone}', '${contact.email}', '${contact.country}', '${contact.state}', '${contact.city}', '${contact.birthday}'),\n`;
       });
 
       let finalValue = values.slice(0, -2);
 
       connection.query(
-        `insert into audience (user_id,subscriberGroup,firstName,lastName,tel,email,country,state,city,birthday) ${finalValue}`,
+        `insert into audience (user_id,firstName,lastName,tel,email,country,state,city,birthday) ${finalValue}`,
         (dbErr, resp) => {
           if (dbErr) return res.status(400).send("Internal Server Error");
           res.send("Contacts Imported Successfully");

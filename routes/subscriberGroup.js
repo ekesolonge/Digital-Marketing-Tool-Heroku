@@ -7,6 +7,7 @@ const {
   deleteSubscriberGroup,
   createSubscriberGroup,
   editSubscriberGroup,
+  assignSubscriberGroup,
 } = require("../controllers/subscriberGroup");
 
 // GET ALL SubscriberGroup
@@ -23,5 +24,12 @@ router.post("/", authenticate, createSubscriberGroup);
 
 // EDIT SubscriberGroup
 router.put("/:id", authenticate, editSubscriberGroup);
+
+// Assign SubscriberGroup
+router.post(
+  "/assignGroup/:audienceId/:groupId",
+  authenticate,
+  assignSubscriberGroup
+);
 
 module.exports = router;
