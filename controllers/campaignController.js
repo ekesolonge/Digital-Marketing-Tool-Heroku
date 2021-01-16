@@ -55,7 +55,14 @@ const deleteCampaign = (req, res) => {
 
 // REST API to Insert campaign
 const createCampaign = (req, res) => {
-  if (!req.body.name || !req.body.subscriberGroup || !req.body.emailTemplate)
+  if (
+    !req.body.name ||
+    !req.body.fromName ||
+    !req.body.fromEmail ||
+    !req.body.subject ||
+    !req.body.subscriberGroup ||
+    !req.body.emailTemplate
+  )
     return res.status(400).send("Please fill all required fields");
 
   connection.query(
@@ -80,8 +87,11 @@ const createCampaign = (req, res) => {
 
       // INSERT into database
       connection.query(
-        `insert into campaign (name,subscriberGroup,emailTemplate,createdBy) values
+        `insert into campaign (name,fromName,fromEmail,subject,subscriberGroup,emailTemplate,createdBy) values
                   ('${req.body.name}',
+                  '${req.body.fromName}',
+                  '${req.body.fromEmail}',
+                  '${req.body.subject}',
                   '${req.body.subscriberGroup}',
                   '${req.body.emailTemplate}',
                   '${req.user.data.userId}')`,
@@ -120,20 +130,8 @@ const editCampaign = (req, res) => {
               .status(404)
               .send("User has no email templates or subscriber groups yet");
 
-          let emailTemplate = resp.find(
-            (x) => x.subscriberGroupID == req.body.subscriberGroup
-          );
-          let subscriberGroup = resp.find(
-            (x) => x.emailTemplateID == req.body.emailTemplate
-          );
-
-          if (emailTemplate == undefined || subscriberGroup == undefined)
-            return res
-              .status(404)
-              .send("Email Template or Subscriber doesn't exist");
-
           connection.query(
-            `update campaign set name = '${req.body.name}',subscriberGroup = '${req.body.subscriberGroup}',emailTemplate = '${req.body.emailTemplate}',dateCreated = current_timestamp() where id=${req.params.id}`,
+            `update campaign set name = '${req.body.name}',fromName = '${req.body.fromName}',fromEmail = '${req.body.fromEmail}',subject = '${req.body.subject}',subscriberGroup = '${req.body.subscriberGroup}',emailTemplate = '${req.body.emailTemplate}',dateCreated = current_timestamp() where id=${req.params.id}`,
             (err, response) => {
               if (err) return res.status(400).send("Internal server error");
               res.send("campaign edited Successfully");
@@ -156,25 +154,27 @@ const editCampaign = (req, res) => {
 // Send Campaign
 const sendCampaign = (req, res, next) => {
   connection.query(
-    `select campaign.name as campaignName,audience.email,subscriber_group.name,email_templates.html from campaign 
+    `select campaign.name as campaignName,campaign.fromName,campaign.fromEmail,campaign.subject,audience.email,subscriber_group.name,email_templates.html from campaign 
     inner join subscriber_group on campaign.subscriberGroup = subscriber_group.id 
     inner join audience_group on audience_group.subscriberGroupId = subscriber_group.id 
     inner join audience on audience_group.audienceId = audience.id 
-    inner join email_templates on email_templates.id = campaign.emailTemplate where campaign.id=${req.params.id}`,
+    inner join email_templates on email_templates.id = campaign.emailTemplate where campaign.createdBy=${req.user.data.userId} and campaign.id=${req.params.id}`,
     (err, resp) => {
       if (!resp || resp.length < 1 || err)
         return res.status(400).send("Internal server error");
 
-      if (!req.body.subject) req.body.subject = resp[0].campaignName;
-      if (!req.body.from) req.body.from = req.user.data.email;
-
       let recipients = resp.map((x) => x.email);
 
+      let from = {
+        name: resp[0].fromName,
+        address: resp[0].fromEmail,
+      };
+
       sendMail(
-        `"${req.body.from}" <${req.user.data.email}>`,
-        `${req.body.subject}`,
-        `${recipients}`,
-        `${resp[0].html}`,
+        from,
+        resp[0].subject,
+        recipients,
+        resp[0].html,
         (err3, info) => {
           if (err3) return res.status(400).send("Internal Server Error");
           res.status(201).send("Campaign sent successfully!");
