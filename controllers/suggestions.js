@@ -7,6 +7,11 @@ const getSuggestions = (req, res) => {
     if (err) return res.status(400).send("Internal Server Error");
     res.send(resp);
   });
+
+  connection.query(`update suggestions set isRead = ${true}`, (err, resp) => {
+    if (err) return res.status(400).send("Internal Server Error");
+    return;
+  });
 };
 
 //Post Suggestions
@@ -16,7 +21,9 @@ const createSuggestions = (req, res) => {
 
   // INSERT into database
   connection.query(
-    `insert into suggestions (userId,category,message) values('${req.user.data.userId}','${req.body.category}','${req.body.message}')`,
+    `insert into suggestions (userId,category,message,isRead) values('${
+      req.user.data.userId
+    }','${req.body.category}','${req.body.message}',${false})`,
     (err, resp) => {
       if (err) return res.status(400).send("Internal Server Error");
       res.send("Suggestion Sent successfully.");
