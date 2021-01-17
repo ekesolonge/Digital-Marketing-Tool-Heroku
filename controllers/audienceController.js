@@ -25,6 +25,19 @@ const getAudienceById = (req, res) => {
   );
 };
 
+const getAudienceByGroup = (req, res) => {
+  connection.query(
+    `select audience.user_id,subscriber_group.id as GroupId,subscriber_group.name as GroupName,firstName,lastName,email,tel,country,state,city,birthday from audience 
+    inner join audience_group on audience.id = audience_group.audienceId
+    inner join subscriber_group on subscriber_group.id = audience_group.subscriberGroupId where audience.user_id = ${req.user.data.userId} and audience_group.subscriberGroupId = ${req.params.id}`,
+    (err, resp) => {
+      if (!resp || err || resp.length < 1)
+        return res.status(404).send("Record does not exist.");
+      res.send(resp[0]);
+    }
+  );
+};
+
 // Delete an audience API
 const deleteAudience = (req, res) => {
   connection.query(
@@ -179,6 +192,7 @@ const importContacts = (req, res) => {
 module.exports = {
   getAudience,
   getAudienceById,
+  getAudienceByGroup,
   deleteAudience,
   createAudience,
   editAudience,

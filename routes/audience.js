@@ -5,6 +5,7 @@ const upload = require("../middleware/uploadCSV");
 const {
   getAudience,
   getAudienceById,
+  getAudienceByGroup,
   deleteAudience,
   createAudience,
   editAudience,
@@ -14,8 +15,11 @@ const {
 // GET ALL Audience
 router.get("/", authenticate, getAudience);
 
-// GET ALL Audience BY ID
+// GET Audience BY ID
 router.get("/:id", authenticate, getAudienceById);
+
+// GET Audience BY Group
+router.get("/group/:id", authenticate, getAudienceByGroup);
 
 // DELETE Audience
 router.delete("/:id", authenticate, deleteAudience);
