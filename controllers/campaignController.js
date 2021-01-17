@@ -192,6 +192,47 @@ const sendCampaign = (req, res, next) => {
   );
 };
 
+// Send Campaign to All
+const sendCampaignToAll = (req, res, next) => {
+  connection.query(
+    `select campaign.name as campaignName,campaign.fromName,campaign.fromEmail,campaign.subject,audience.email,email_templates.html from campaign 
+    inner join email_templates on email_templates.id = campaign.emailTemplate
+    INNER JOIN audience on createdBy = audience.user_id where campaign.createdBy=${req.user.data.userId} and campaign.id=${req.params.id}`,
+    (err, resp) => {
+      if (!resp || resp.length < 1 || err)
+        return res.status(400).send("Internal server error");
+
+      let recipients = resp.map((x) => x.email);
+
+      console.log(resp[0]);
+      console.log(recipients);
+      let from = {
+        name: resp[0].fromName,
+        address: resp[0].fromEmail,
+      };
+
+      sendMail(
+        from,
+        resp[0].subject,
+        recipients,
+        resp[0].html,
+        (err3, info) => {
+          if (err3) return res.status(400).send("Internal Server Error");
+          res.status(201).send("Campaign sent successfully!");
+
+          // Audit Trail
+          let trail = {
+            actor: req.user.data.username,
+            action: `sent a campaign to all audience`,
+            type: "success",
+          };
+          logTrail(trail);
+        }
+      );
+    }
+  );
+};
+
 module.exports = {
   getCampaign,
   getCampaignById,
@@ -199,4 +240,5 @@ module.exports = {
   createCampaign,
   editCampaign,
   sendCampaign,
+  sendCampaignToAll,
 };

@@ -8,6 +8,7 @@ const {
   createCampaign,
   editCampaign,
   sendCampaign,
+  sendCampaignToAll,
 } = require("../controllers/campaignController");
 
 // GET ALL Campaign
@@ -27,5 +28,8 @@ router.put("/:id", authenticate, editCampaign);
 
 // Send Campaign
 router.post("/sendCampaign/:id", authenticate, sendCampaign);
+
+// Send Campaign to All
+router.post("/sendCampaignAll/:id", authenticate, sendCampaignToAll);
 
 module.exports = router;
