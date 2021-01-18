@@ -164,6 +164,8 @@ const editUser = (req, res, next) => {
         bcrypt.hash(password, 10, (err, hash) => {
           if (err) return res.status(400).send("Internal Server Error");
 
+          if (!password) password = hash;
+
           // Store Path of image uploaded
           var filePath;
           if (req.file) {
@@ -172,7 +174,7 @@ const editUser = (req, res, next) => {
             filePath = users[0].picture;
           }
 
-          let sql = `update users set firstName = '${firstName}', lastName = '${lastName}',username = '${username}',tel = '${tel}',email = '${email.toLowerCase()}',password = '${hash}',website = '${website}',picture = '${filePath}' where id = ${
+          let sql = `update users set firstName = '${firstName}', lastName = '${lastName}',username = '${username}',tel = '${tel}',email = '${email.toLowerCase()}',password = '${password}',website = '${website}',picture = '${filePath}' where id = ${
             req.params.id
           }`;
           connection.query(sql, (err, db_res) => {
@@ -235,6 +237,8 @@ const updateProfile = (req, res, next) => {
         bcrypt.hash(password, 10, (err, hash) => {
           if (err) return res.status(400).send("Internal Server Error");
 
+          if (!password) password = hash;
+
           // Store Path of image uploaded
           var filePath;
           if (req.file) {
@@ -243,7 +247,7 @@ const updateProfile = (req, res, next) => {
             filePath = users[0].picture;
           }
 
-          let sql = `update users set firstName = '${firstName}', lastName = '${lastName}',username = '${username}',tel = '${tel}',email = '${email.toLowerCase()}',password = '${hash}',website = '${website}',picture = '${filePath}' where id = ${
+          let sql = `update users set firstName = '${firstName}', lastName = '${lastName}',username = '${username}',tel = '${tel}',email = '${email.toLowerCase()}',password = '${password}',website = '${website}',picture = '${filePath}' where id = ${
             req.user.data.userId
           }`;
           connection.query(sql, (err, db_res) => {
