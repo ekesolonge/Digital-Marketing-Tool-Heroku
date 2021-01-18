@@ -32,7 +32,7 @@ router.delete("/:id", authenticate, manageUser, deleteUser);
 router.post("/", authenticate, manageUser, createUser);
 
 // EDIT USER (ADMIN)
-router.put("/:id", authenticate, upload.single("image"), editUser);
+router.put("/:id", authenticate, manageUser, upload.single("image"), editUser);
 
 // UPDATE PROFILE
 router.put("/", authenticate, upload.single("image"), updateProfile);
