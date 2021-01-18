@@ -4,10 +4,14 @@ const { authenticate } = require("../middleware/authorization"); // authorizatio
 const {
   getSuggestions,
   createSuggestions,
+  getSuggestionsById,
 } = require("../controllers/suggestions");
 
 // GET ALL Suggestions
 router.get("/", authenticate, getSuggestions);
+
+// GET Suggestions by ID
+router.get("/:id", authenticate, getSuggestionsById);
 
 // CREATE A NEW Suggestions
 router.post("/", authenticate, createSuggestions);

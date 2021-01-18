@@ -14,6 +14,22 @@ const getSuggestions = (req, res) => {
   });
 };
 
+const getSuggestionsById = (req, res) => {
+  connection.query(
+    `select * from suggestions where id = ${req.params.id}`,
+    (err, resp) => {
+      if (err || resp.length < 1)
+        return res.status(400).send("Internal Server Error");
+      res.send(resp[0]);
+    }
+  );
+
+  connection.query(`update suggestions set isRead = ${true}`, (err, resp) => {
+    if (err) return res.status(400).send("Internal Server Error");
+    return;
+  });
+};
+
 //Post Suggestions
 const createSuggestions = (req, res) => {
   if (!req.body.category || !req.body.message)
@@ -39,4 +55,4 @@ const createSuggestions = (req, res) => {
   );
 };
 
-module.exports = { getSuggestions, createSuggestions };
+module.exports = { getSuggestions, getSuggestionsById, createSuggestions };
