@@ -3,6 +3,7 @@ const express = require("express"); // express module
 const router = express.Router(); // router
 const { authenticate, manageUser } = require("../middleware/authorization"); // authorization middleware
 const upload = require("../middleware/uploadImage"); // file upload
+const s3 = require("../middleware/s3");
 // import userControllers
 const {
   getUsers,
@@ -32,10 +33,17 @@ router.delete("/:id", authenticate, manageUser, deleteUser);
 router.post("/", authenticate, manageUser, createUser);
 
 // EDIT USER (ADMIN)
-router.put("/:id", authenticate, manageUser, upload.single("image"), editUser);
+router.put(
+  "/:id",
+  authenticate,
+  manageUser,
+  upload.single("image"),
+  s3,
+  editUser
+);
 
 // UPDATE PROFILE
-router.put("/", authenticate, upload.single("image"), updateProfile);
+router.put("/", authenticate, upload.single("image"), s3, updateProfile);
 
 // SIGNUP
 router.post("/signup", signup);

@@ -169,7 +169,7 @@ const editUser = (req, res, next) => {
           // Store Path of image uploaded
           var filePath;
           if (req.file) {
-            filePath = `${process.env.BASE_URL}/${req.filePath}`;
+            filePath = req.filePath;
           } else {
             filePath = users[0].picture;
           }
@@ -242,7 +242,7 @@ const updateProfile = (req, res, next) => {
           // Store Path of image uploaded
           var filePath;
           if (req.file) {
-            filePath = `${process.env.BASE_URL}/${req.filePath}`;
+            filePath = req.filePath;
           } else {
             filePath = users[0].picture;
           }
